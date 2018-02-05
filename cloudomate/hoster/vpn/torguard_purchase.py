@@ -69,9 +69,9 @@ class torguard:
 
         # Selenium setup: headless Chrome, Window size needs to be big enough, otherwise elements will not be found.
         options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('disable-gpu');
-        options.add_argument('window-size=1920,1080');
+        #options.add_argument('headless')
+        #options.add_argument('disable-gpu');
+        #options.add_argument('window-size=1920,1080');
         try:
             self.driver = webdriver.Chrome(executable_path=driver_loc, chrome_options=options)
             pass
