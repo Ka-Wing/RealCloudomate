@@ -1,127 +1,225 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
-import json, requests
-from time import sleep
+from builtins import open
+from builtins import str
+
+import json
+import requests
+import time
 import os
 import base64
 
+from future import standard_library
 
-class captchaSolver:
+standard_library.install_aliases()
 
-    __clientKey = "not set"
+"""
+Usage: 
 
-    def __init__(self, cKey):
-        self.__clientKey = cKey
+Feed Anti Captcha account API key to solver:
+c_solver = CaptchaSolver("fd58e13e22604e820052b44611d61d6c")
 
-    def getBalance(self):
-        r = requests.post('https://api.anti-captcha.com/getBalance',
-                          json={"clientKey": self.__clientKey})
+Find out how much money is left:
+temp = c_solver.get_balance()
 
-        if(r.status_code == requests.codes.ok):
-            j = json.loads(r.text)
-            if(j["errorId"] == 0):
-                print("OK")
-                return j["balance"]
+Provide captcha image full path to solver method to get solution:
+solution = c_solver.solve_captcha_text_case_sensitive(
+                     "/home/testm2/Desktop/testcscr/php/pyhton/cap2.jpg")
+print(str(solution))
+
+Feed Anti-captcha account API key to solver:
+rc_solver = ReCaptchaSolver("fd58e13e22604e820052b44611d61d6c")
+
+Find out how much money is left:
+temp = rc_solver.get_balance()
+
+Provide solver method with Google ReCapthca URL and ReCaptcha website
+key usually found as data-sitekey attribute in an HTML element in the
+website containing the ReCaptcha:
+wUrl = "http://http.myjino.ru/recaptcha/test-get.php"
+wKey = "6Lc_aCMTAAAAABx7u2W0WPXnVbI_v6ZdbM6rYf16"
+rc_solution = rc_solver.solve_google_recaptcha(wUrl,wKey)
+print(rc_solution)
+"""
+
+
+class CaptchaSolver(object):
+    _client_key = "not set"
+
+    def __init__(self, c_key):
+        self._client_key = c_key
+
+    def get_balance(self):
+        # Query API for account balance
+        response = requests.post("https://api.anti-captcha.com/getBalance",
+                                 json={"clientKey": self._client_key})
+
+        # Check response of HTTP request
+        if (response.status_code == requests.codes.ok):
+            response_json = json.loads(response.text)
+            if (response_json["errorId"] == 0):
+                print("Successful, account balance returned")
+                return response_json["balance"]
             else:
-                print(r.text)
-                #handle api error
+                # Print API error
+                print(response.text)
         else:
-            print(r.status_code)
-            #handle request error
+            # Print request error
+            print(response.status_code)
 
-    def solveCaptchaTextCaseSensitive(self, fullImageFilePath):
+    def solve_captcha_text_case_sensitive(self, full_image_file_path):
+        # Encode captcha image before sending it
         encoded_image_string = ""
-        if(os.path.isfile(fullImageFilePath) == True):
-            with open(fullImageFilePath, "rb") as image_file:
+        if os.path.isfile(full_image_file_path):
+            with open(full_image_file_path, "rb") as image_file:
                 encoded_image_string = base64.b64encode(image_file.read())
-                print("image sucessfully encoded")
+                print("Captcha image sucessfully encoded")
         else:
-            print("error file path not fo")
+            print("Error: file path not found")
             return
 
-        taskId = self.__createTaskCaptchaTextCaseSensitive(encoded_image_string)
-        currentStatus = self.__getTaskStatus(taskId)
-        while currentStatus == "processing":
-            print("sleeping 5 sec")
-            sleep(5)
-            currentStatus = self.__getTaskStatus(taskId)
-            print("current status: " + str(currentStatus))
+        # Create new Captcha solving task using the API
+        task_id = self._create_task_captcha_text_case_sensitive(
+            encoded_image_string)
 
-        solution = self.__getTaskResult(taskId)
+        # Query API until task is finished
+        current_status = self._get_task_status(task_id)
+        while current_status == "processing":
+            print("Sleeping 5 sec")
+            time.sleep(5)
+            current_status = self._get_task_status(task_id)
+            print("Current status: " + str(current_status))
+
+        # Get solution
+        solution = self._get_task_result(task_id)
         return solution["text"]
 
+    def _get_task_result(self, task_id):
+        # Query API for the solution of the task       
+        response = requests.post("https://api.anti-captcha.com/getTaskResult",
+                                 json={"clientKey": self._client_key,
+                                       "taskId": task_id})
 
-
-    def __getTaskResult(self, taskId):
-        r = requests.post('https://api.anti-captcha.com/getTaskResult',
-                          json={"clientKey": self.__clientKey,
-                                "taskId": taskId})
-
-        if (r.status_code == requests.codes.ok):
-            j = json.loads(r.text)
-            if (j["errorId"] == 0):
-                print("captcha solved:")
-                #print(r.text)
-                return j["solution"]
+        # Check response of HTTP request
+        if (response.status_code == requests.codes.ok):
+            response_json = json.loads(response.text)
+            if (response_json["errorId"] == 0):
+                print("Successful, captcha solved:")
+                return response_json["solution"]
             else:
-                print(r.text)
-                # handle api error
+                # Print API error
+                print(response.text)
         else:
-            print(r.status_code)
-            # handle request error
+            # Print request error
+            print(response.status_code)
 
+    def _get_task_status(self, task_id):
+        # Query API for the status of the task
+        response = requests.post("https://api.anti-captcha.com/getTaskResult",
+                                 json={"clientKey": self._client_key,
+                                       "taskId": task_id})
 
-
-    def __getTaskStatus(self, taskId):
-        r = requests.post('https://api.anti-captcha.com/getTaskResult',
-                          json={"clientKey": self.__clientKey,
-                                "taskId": taskId})
-
-        if (r.status_code == requests.codes.ok):
-            j = json.loads(r.text)
-            if (j["errorId"] == 0):
-                print("OK")
-                return j["status"]
+        # Check response of HTTP request
+        if (response.status_code == requests.codes.ok):
+            response_json = json.loads(response.text)
+            if (response_json["errorId"] == 0):
+                print("Successful, task status returned")
+                return response_json["status"]
             else:
-                print(r.text)
-                # handle api error
+                # Print API error
+                print(response.text)
         else:
-            print(r.status_code)
-            # handle request error
+            # Print request error
+            print(response.status_code)
 
+    def _create_task_captcha_text_case_sensitive(self, base64_image_string):
+        # Send task creation command to API
+        response = requests.post("https://api.anti-captcha.com/createTask",
+                                 json={"clientKey": self._client_key,
+                                       "task":
+                                           {
+                                               "type": "ImageToTextTask",
+                                               "body": base64_image_string,
+                                               "phrase": False,
+                                               "case": True,
+                                               "numeric": False,
+                                               "math": 0,
+                                               "minLength": 0,
+                                               "maxLength": 0
+                                           }
+                                       })
 
-    def __createTaskCaptchaTextCaseSensitive(self,base64_image_string):
-        r = requests.post('https://api.anti-captcha.com/createTask',
-                          json={"clientKey": self.__clientKey, "task":
-                              {
-                                  "type": "ImageToTextTask",
-                                  "body": base64_image_string,
-                                  "phrase": False,
-                                  "case": True,
-                                  "numeric": False,
-                                  "math": 0,
-                                  "minLength": 0,
-                                  "maxLength": 0
-                              }
-                                })
-
-        if (r.status_code == requests.codes.ok):
-            j = json.loads(r.text)
-            if (j["errorId"] == 0):
-                print("OK" + r.text)
-                return j["taskId"]
-            elif(j["errorCode"] == "ERROR_NO_SLOT_AVAILABLE"):
-                sleep(15)
-                return self.__createTaskCaptchaTextCaseSensitive(base64_image_string)
+        # Check response of HTTP request
+        if (response.status_code == requests.codes.ok):
+            response_json = json.loads(response.text)
+            if (response_json["errorId"] == 0):
+                print("Successful, captcha task was created:" + response.text)
+                return response_json["taskId"]
+            elif (response_json["errorCode"] == "ERROR_NO_SLOT_AVAILABLE"):
+                time.sleep(15)
+                return self._create_task_captcha_text_case_sensitive(
+                    base64_image_string)
             else:
-                print(r.text)
-                # handle api error
+                # Print API error
+                print(response.text)
         else:
-            print(r.status_code)
-            #handle request error
+            # Print request error
+            print(response.status_code)
 
-    def getCurrentKey(self):
-        return self.__clientKey
-
-
+    def get_current_key(self):
+        return self._client_key
 
 
+class ReCaptchaSolver(CaptchaSolver):
+    def _create_task_google_recaptcha(self, website_url, website_key):
+        # Send task creation command to API
+        response = requests.post("https://api.anti-captcha.com/createTask",
+                                 json={"clientKey": self._client_key, "task":
+                                     {
+                                         "type": "NoCaptchaTaskProxyless",
+                                         "websiteURL": website_url,
+                                         "websiteKey": website_key
+                                     },
+                                       "softId": 0,
+                                       "languagePool": "en"
+                                       })
+
+        # Check response of HTTP request
+        if (response.status_code == requests.codes.ok):
+            response_json = json.loads(response.text)
+            if (response_json["errorId"] == 0):
+                print("Successful, task was created: " + response.text)
+                return response_json["taskId"]
+            elif (response_json["errorCode"] == "ERROR_NO_SLOT_AVAILABLE"):
+                # In case task could not be created, create it again
+                time.sleep(15)
+                return self._create_task_google_recaptcha(website_url,
+                                                          website_key)
+            else:
+                # Print API errordd
+                print(response.text)
+        else:
+            # Print request error
+            print(response.status_code)
+
+    def solve_google_recaptcha(self, website_url, website_key):
+        # Create new Google ReCaptcha solving task using the API
+        task_id = self._create_task_google_recaptcha(website_url, website_key)
+        print("Sleeping 15 sec")
+        time.sleep(15)
+
+        # Query API until task is finished
+        current_status = self._get_task_status(task_id)
+        while current_status == "processing":
+            print("Current status: " + str(current_status))
+            print("Sleeping 5 sec")
+            time.sleep(5)
+            current_status = self._get_task_status(task_id)
+            print("Current status: " + str(current_status))
+
+        # Get solution of task
+        solution = self._get_task_result(task_id)
+        return solution["gRecaptchaResponse"]

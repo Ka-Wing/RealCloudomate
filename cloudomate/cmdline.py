@@ -17,8 +17,7 @@ from os import path
 from CaseInsensitiveDict import CaseInsensitiveDict
 from future import standard_library
 
-from cloudomate import bitcoin_wallet as bitcoin_wallet_util
-from cloudomate import ethereum_wallet as ethereum_wallet_util
+from cloudomate import wallet as wallet_util
 from cloudomate.hoster.vpn.azirevpn import AzireVpn
 from cloudomate.hoster.vpn.mullvad import MullVad
 from cloudomate.hoster.vps.blueangelhost import BlueAngelHost
@@ -29,8 +28,7 @@ from cloudomate.hoster.vps.pulseservers import Pulseservers
 from cloudomate.hoster.vps.undergroundprivate import UndergroundPrivate
 from cloudomate.util.fakeuserscraper import UserScraper
 from cloudomate.util.settings import Settings
-from cloudomate.bitcoin_wallet import Wallet as BitcoinWallet
-from cloudomate.ethereum_wallet import Wallet as EthereumWallet
+from cloudomate.wallet import Wallet
 
 standard_library.install_aliases()
 
@@ -39,11 +37,10 @@ def _map_providers_to_dict(provider_list):
     return CaseInsensitiveDict(dict((provider.get_metadata()[0], provider) for provider in provider_list))
 
 
-types = ["vps_bitcoin", "vpn_bitcoin", "vps_ethereum", "vps_ethereum"]
-wallet_type = ["bitcoin", "ethereum"]
+types = ["vps", "vpn"]
 
 providers = CaseInsensitiveDict({
-    "vps_bitcoin": _map_providers_to_dict([
+    "vps": _map_providers_to_dict([
         BlueAngelHost,
         CCIHosting,
         CrownCloud,
@@ -51,15 +48,9 @@ providers = CaseInsensitiveDict({
         Pulseservers,
         UndergroundPrivate,
     ]),
-    "vpn_bitcoin": _map_providers_to_dict([
+    "vpn": _map_providers_to_dict([
         AzireVpn,
         MullVad,
-    ]),
-    "vps_ethereum": _map_providers_to_dict([
-        BlueAngelHost,
-    ]),
-    "vpn_ethereum": _map_providers_to_dict([
-        AzireVpn,
     ])
 })
 
@@ -68,72 +59,41 @@ def execute(cmd=sys.argv[1:]):
     parser = ArgumentParser(description="Cloudomate")
 
     subparsers = parser.add_subparsers(dest="type")
-    add_vps_parsers_bitcoin(subparsers)
-    add_vpn_parsers_bitcoin(subparsers)
-    add_vps_parsers_ethereum(subparsers)
-    add_vpn_parsers_ethereum(subparsers)
+    add_vps_parsers(subparsers)
+    add_vpn_parsers(subparsers)
     subparsers.required = True
 
     args = parser.parse_args(cmd)
     args.func(args)
 
 
-def add_vpn_parsers_bitcoin(subparsers):
-    vpn_parsers = subparsers.add_parser("vpn_bitcoin")
-    vpn_parsers.set_defaults(type="vpn_bitcoin")
+def add_vpn_parsers(subparsers):
+    vpn_parsers = subparsers.add_parser("vpn")
+    vpn_parsers.set_defaults(type="vpn")
     vpn_subparsers = vpn_parsers.add_subparsers(dest="command")
     vpn_subparsers.required = True
 
-    add_parser_list(vpn_subparsers, "vpn_bitcoin")
-    add_parser_options(vpn_subparsers, "vpn_bitcoin")
-    add_parser_purchase(vpn_subparsers, "vpn_bitcoin")
-    add_parser_status(vpn_subparsers, "vpn_bitcoin")
-    add_parser_info(vpn_subparsers, "vpn_bitcoin")
+    add_parser_list(vpn_subparsers, "vpn")
+    add_parser_options(vpn_subparsers, "vpn")
+    add_parser_purchase(vpn_subparsers, "vpn")
+    add_parser_status(vpn_subparsers, "vpn")
+    add_parser_info(vpn_subparsers, "vpn")
 
 
-def add_vps_parsers_bitcoin(subparsers):
-    vps_parsers = subparsers.add_parser("vps_bitcoin")
-    vps_parsers.set_defaults(type="vps_bitcoin")
+def add_vps_parsers(subparsers):
+    vps_parsers = subparsers.add_parser("vps")
+    vps_parsers.set_defaults(type="vps")
     vps_subparsers = vps_parsers.add_subparsers(dest="command")
     vps_subparsers.required = True
 
-    add_parser_list(vps_subparsers, "vps_bitcoin")
-    add_parser_options(vps_subparsers, "vps_bitcoin")
-    add_parser_purchase(vps_subparsers, "vps_bitcoin")
-    add_parser_status(vps_subparsers, "vps_bitcoin")
+    add_parser_list(vps_subparsers, "vps")
+    add_parser_options(vps_subparsers, "vps")
+    add_parser_purchase(vps_subparsers, "vps")
+    add_parser_status(vps_subparsers, "vps")
     add_parser_vps_setrootpw(vps_subparsers)
     add_parser_vps_get_ip(vps_subparsers)
     add_parser_vps_ssh(vps_subparsers)
-    add_parser_info(vps_subparsers, "vps_bitcoin")
-
-
-def add_vpn_parsers_ethereum(subparsers):
-    vpn_parsers = subparsers.add_parser("vpn_ethereum")
-    vpn_parsers.set_defaults(type="vpn_ethereum")
-    vpn_subparsers = vpn_parsers.add_subparsers(dest="command")
-    vpn_subparsers.required = True
-
-    add_parser_list(vpn_subparsers, "vpn_ethereum")
-    add_parser_options(vpn_subparsers, "vpn_ethereum")
-    add_parser_purchase(vpn_subparsers, "vpn_ethereum")
-    add_parser_status(vpn_subparsers, "vpn_ethereum")
-    add_parser_info(vpn_subparsers, "vpn_ethereum")
-
-
-def add_vps_parsers_ethereum(subparsers):
-    vps_parsers = subparsers.add_parser("vps_ethereum")
-    vps_parsers.set_defaults(type="vps_ethereum")
-    vps_subparsers = vps_parsers.add_subparsers(dest="command")
-    vps_subparsers.required = True
-
-    add_parser_list(vps_subparsers, "vps_ethereum")
-    add_parser_options(vps_subparsers, "vps_ethereum")
-    add_parser_purchase(vps_subparsers, "vps_ethereum")
-    add_parser_status(vps_subparsers, "vps_ethereum")
-    add_parser_vps_setrootpw(vps_subparsers)
-    add_parser_vps_get_ip(vps_subparsers)
-    add_parser_vps_ssh(vps_subparsers)
-    add_parser_info(vps_subparsers, "vps_ethereum")
+    add_parser_info(vps_subparsers, "vps")
 
 
 def add_parser_list(subparsers, provider_type):
@@ -168,14 +128,13 @@ def add_parser_purchase(subparsers, provider_type):
     parser_purchase.add_argument("-z", "--zipcode", help="zipcode")
     parser_purchase.add_argument("--randomuser", action="store_true", help="Use random user info")
 
-    if provider_type == 'vps_bitcoin' or provider_type == 'vps_ethereum':
+    if provider_type == 'vps':
         parser_purchase.add_argument("option", help="The %s option number (see options)" % provider_type.upper(),
                                      type=int)
         parser_purchase.add_argument("-rp", "--rootpw", help="root password")
         parser_purchase.add_argument("-ns1", "--ns1", help="ns1")
         parser_purchase.add_argument("-ns2", "--ns2", help="ns2")
         parser_purchase.add_argument("--hostname", help="hostname")
-    
 
 
 def add_parser_status(subparsers, provider_type):
@@ -188,7 +147,7 @@ def add_parser_status(subparsers, provider_type):
 
 def add_parser_vps_get_ip(subparsers):
     parser_get_ip = subparsers.add_parser("getip", help="Get the IP address of the specified service")
-    parser_get_ip.add_argument("provider", help="The specified provider", nargs="?", choices=providers['vps_bitcoin'])
+    parser_get_ip.add_argument("provider", help="The specified provider", nargs="?", choices=providers['vps'])
     parser_get_ip.add_argument("-n", "--number", help="The number of the service get the IP address for")
     parser_get_ip.add_argument("-e", "--email", help="The login email address")
     parser_get_ip.add_argument("-pw", "--password", help="The login password")
@@ -197,7 +156,7 @@ def add_parser_vps_get_ip(subparsers):
 
 def add_parser_vps_ssh(subparsers):
     parser_ssh = subparsers.add_parser("ssh", help="SSH into an active service")
-    parser_ssh.add_argument("provider", help="The specified provider", nargs="?", choices=providers['vps_bitcoin'])
+    parser_ssh.add_argument("provider", help="The specified provider", nargs="?", choices=providers['vps'])
     parser_ssh.add_argument("-n", "--number", help="The number of the service to SSH into")
     parser_ssh.add_argument("-e", "--email", help="The login email address")
     parser_ssh.add_argument("-pw", "--password", help="The login password")
@@ -215,7 +174,7 @@ def add_parser_info(subparsers, provider_type):
     parser_info.add_argument("-e", "--email", help="The login email address")
     parser_info.add_argument("-pw", "--password", help="The login password")
 
-    if provider_type == "vpn_bitcoin" or provider_type == "vpn_ethereum":
+    if provider_type == "vpn":
         parser_info.add_argument("-o", "--ovpn", help="Save the ovpn file to the specified location")
 
     parser_info.set_defaults(func=info)
@@ -223,7 +182,7 @@ def add_parser_info(subparsers, provider_type):
 
 def add_parser_vps_setrootpw(subparsers):
     parser_setrootpw = subparsers.add_parser("setrootpw", help="Set the root password of the last activated service")
-    parser_setrootpw.add_argument("provider", help="The specified provider", choices=providers['vps_bitcoin'])
+    parser_setrootpw.add_argument("provider", help="The specified provider", choices=providers['vps'])
     parser_setrootpw.add_argument("root_password", help="The new root password")
     parser_setrootpw.add_argument("-n", "--number", help="The number of the VPS service to change the password for")
     parser_setrootpw.add_argument("-e", "--email", help="The login email address")
@@ -248,10 +207,10 @@ def info(args):
 
     config = provider(user_settings).get_configuration()
 
-    if args.type == "vps_bitcoin" or args.type == "vps_ethereum":
+    if args.type == "vps":
         print(("Info for " + name))
         _print_info_vps(config)
-    elif args.type == "vpn_bitcoin" or args.type == "vpn_ethereum":
+    elif args.type == "vpn":
         if args.ovpn:
             _save_info_vpn(config, args.ovpn)
         else:
@@ -267,7 +226,7 @@ def status(args):
     p = provider(user_settings)
     s = p.get_status()
 
-    if args.type == "vps_bitcoin" or args.type == "vps_ethereum":
+    if args.type == "vps":
         # If we don't currently support usage statistics for this provider
         if s.memory.used == -1.0:
             row = "{:20}" * 2
@@ -283,7 +242,7 @@ def status(args):
                 str(s.online),
                 s.expiration.isoformat()
             ))
-    elif args.type == "vpn_bitcoin" or args.type == "vpn_ethereum":
+    elif args.type == "vpn":
         row = "{:18}" * 2
         print(row.format("Online", "Expiration"))
         print(row.format(str(s.online), s.expiration.isoformat()))
@@ -292,14 +251,10 @@ def status(args):
 def options(args):
     provider = _get_provider(args)
 
-    if args.type == "vps_bitcoin":
-        _options_vps_bitcoin(provider)
-    elif args.type == "vpn_bitcoin":
-        _options_vpn_bitcoin(provider)
-    elif args.type == "vps_ethereum":
-        _options_vps_ethereum(provider)
-    elif args.type == "vpn_ethereum":
-        _options_vpn_ethereum(provider)
+    if args.type == "vps":
+        _options_vps(provider)
+    elif args.type == "vpn":
+        _options_vpn(provider)
 
 
 def purchase(args):
@@ -316,7 +271,7 @@ def purchase(args):
         print("Missing option")
         sys.exit(2)
 
-    if args.type == 'vps_bitcoin' or 'vps_ethereum':
+    if args.type == 'vps':
         _purchase_vps(provider, user_settings, args)
     else:
         _purchase_vpn(provider, user_settings, args)
@@ -375,7 +330,7 @@ def _purchase_vps(provider, user_settings, args):
     else:
         choice = _confirmation("Purchase this option?", default="no")
     if choice:
-        _register(provider, vps_option, user_settings, args)
+        _register(provider, vps_option, user_settings)
     else:
         return False
 
@@ -398,7 +353,7 @@ def _purchase_vpn(provider, user_settings, args):
         choice = _confirmation("Purchase this option?", default="no")
 
     if choice:
-        _register(provider, options[0], user_settings, args)
+        _register(provider, options[0], user_settings)
     else:
         return False
 
@@ -455,7 +410,7 @@ def _list_provider_types():
         print(("   {:15}".format(provider_type)))
 
 
-def _options_vps_bitcoin(p):
+def _options_vps(p):
     name, _ = p.get_metadata()
     print(("Options for %s:\n" % name))
     options = p.get_options()
@@ -468,9 +423,9 @@ def _options_vps_bitcoin(p):
     for i, option in enumerate(options):
         bandwidth = "Unlimited" if option.bandwidth == sys.maxsize else str(option.bandwidth)
 
-        # Calculate the estimated price for Bitcoin
-        rate = bitcoin_wallet_util.get_rate("USD")
-        fee = bitcoin_wallet_util.get_network_fee()
+        # Calculate the estimated price
+        rate = wallet_util.get_rate("USD")
+        fee = wallet_util.get_network_fee()
         gateway = p.get_gateway()
         estimate = gateway.estimate_price(option.price * rate) + fee  # BTC
         estimate = round(1000 * estimate, 2)  # mBTC
@@ -479,7 +434,7 @@ def _options_vps_bitcoin(p):
                          str(option.connection), str(estimate), str(option.price)))
 
 
-def _options_vpn_bitcoin(provider):
+def _options_vpn(provider):
     name, _ = provider.get_metadata()
     print(("Options for %s:\n" % name))
     options = provider.get_options()
@@ -492,9 +447,9 @@ def _options_vpn_bitcoin(provider):
         bandwidth = "Unlimited" if option.bandwidth == sys.maxsize else str(option.bandwidth)
         speed = "Unlimited" if option.speed == sys.maxsize else option.speed
 
-        # Calculate the estimated price for Bitcoin
-        rate = bitcoin_wallet_util.get_rate("USD")
-        fee = bitcoin_wallet_util.get_network_fee()
+        # Calculate the estimated price
+        rate = wallet_util.get_rate("USD")
+        fee = wallet_util.get_network_fee()
         gateway = provider.get_gateway()
         estimate = gateway.estimate_price(option.price * rate) + fee  # BTC
         estimate = round(1000 * estimate, 2)  # mBTC
@@ -502,65 +457,13 @@ def _options_vpn_bitcoin(provider):
         print(row.format(option.name, option.protocol, bandwidth, speed, str(estimate), str(option.price)))
 
 
-def _options_vps_ethereum(p):
-    name, _ = p.get_metadata()
-    print(("Options for %s:\n" % name))
-    options = p.get_options()
-
-    # Print heading
-    row = "{:<5}" + "{:20}" * 8
-    print(row.format("#", "Name", "Cores", "Memory (GB)", "Storage (GB)", "Bandwidth", "Connection (Gbit/s)",
-                     "Est. Price (mETH)", "Price (USD)"))
-
-    for i, option in enumerate(options):
-        bandwidth = "Unlimited" if option.bandwidth == sys.maxsize else str(option.bandwidth)
-
-        # Calculate the estimated price for Ethereum
-        rate = ethereum_wallet_util.get_rate("USD")
-        fee = ethereum_wallet_util.get_network_fee()
-        gateway = p.get_gateway()
-        estimate = gateway.estimate_price(option.price * rate) + fee  # ETH
-        estimate = round(1000 * estimate, 3)  # mETH
-
-        print(row.format(i, option.name, str(option.cores), str(option.memory), str(option.storage), bandwidth,
-                         str(option.connection), str(estimate), str(option.price)))
-
-
-def _options_vpn_ethereum(provider):
-    name, _ = provider.get_metadata()
-    print(("Options for %s:\n" % name))
-    options = provider.get_options()
-
-    # Print heading
-    row = "{:18}" * 6
-    print(row.format("Name", "Protocol", "Bandwidth", "Speed", "Est. Price (mETH)", "Price (USD)"))
-
-    for option in options:
-        bandwidth = "Unlimited" if option.bandwidth == sys.maxsize else str(option.bandwidth)
-        speed = "Unlimited" if option.speed == sys.maxsize else option.speed
-
-        # Calculate the estimated price for Ethereum
-        rate = ethereum_wallet_util.get_rate("USD")
-        fee = ethereum_wallet_util.get_network_fee()
-        gateway = provider.get_gateway()
-        estimate = gateway.estimate_price(option.price * rate) + fee  # ETH
-        estimate = round(1000 * estimate, 3)  # mETH
-
-        print(row.format(option.name, option.protocol, bandwidth, speed, str(estimate), str(option.price)))
-
-def _register(provider, vps_option, settings, args):
+def _register(provider, vps_option, settings):
     # For now use standard wallet implementation through Electrum
     # If wallet path is defined in config, use that.
-    if args.type == 'vps_bitcoin' or 'vpn_bitcoin':
-        if settings.has_key('client', 'walletpath'):
-            wallet = BitcoinWallet(wallet_path=settings.get('client', 
-                                                            'walletpath'))
-        else:
-            wallet = BitcoinWallet()
-    elif args.type == 'vps_ethereum' or 'vpn_ethereum':
-         if settings.has_key('cient', 'privatekey') and settings.has_key('client', 'ethprovider'):
-             wallet = EthereumWallet(privat_key=settings.get('client', 
-             'privatekey'), eth_provider=settings.get('client', 'ethprovider'))
+    if settings.has_key('client', 'walletpath'):
+        wallet = Wallet(wallet_path=settings.get('client', 'walletpath'))
+    else:
+        wallet = Wallet()
 
     provider_instance = provider(settings)
     provider_instance.purchase(wallet, vps_option)
