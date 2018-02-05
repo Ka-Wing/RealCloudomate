@@ -1,0 +1,40 @@
+<div class="table-container clearfix">
+    <table id="tableServicesList" class="table table-list hidden">
+        <thead>
+            <tr>
+                <th>Product/Service</th>
+                <th>Pricing</th>
+                <th>Next Due Date</th>
+                <th>Status</th>
+                <th class="responsive-edit-button" style="display: none;"></th>
+            </tr>
+        </thead>
+        <tbody>
+                            <tr onclick="clickableSafeRedirect(event, 'clientarea.php?action=productdetails&amp;id=8961', false)">
+                    <td><strong>Basic</strong><br /><a href="http://host" target="_blank">host</a></td>
+                    <td class="text-center">$4.99 USD<br />Monthly</td>
+                    <td class="text-center"><span class="hidden">2017-06-19</span>19/06/2017</td>
+                    <td class="text-center"><span class="label status status-active">Active</span></td>
+                    <td class="responsive-edit-button" style="display: none;">
+                        <a href="clientarea.php?action=productdetails&amp;id=8961" class="btn btn-block btn-info">
+                            Manage Product
+                        </a>
+                    </td>
+                </tr>
+                            <tr onclick="clickableSafeRedirect(event, 'clientarea.php?action=productdetails&amp;id=9019', false)">
+                    <td><strong>Basic</strong><br /><a href="http://plebnet4real4@heijligers.me" target="_blank">plebnet4real4@heijligers.me</a></td>
+                    <td class="text-center">$4.99 USD<br />Monthly</td>
+                    <td class="text-center"><span class="hidden">2017-05-24</span>24/05/2017</td>
+                    <td class="text-center"><span class="label status status-cancelled">Cancelled</span></td>
+                    <td class="responsive-edit-button" style="display: none;">
+                        <a href="clientarea.php?action=productdetails&amp;id=9019" class="btn btn-block btn-info">
+                            Manage Product
+                        </a>
+                    </td>
+                </tr>
+                    </tbody>
+    </table>
+    <div class="text-center" id="tableLoading">
+        <p><i class="fa fa-spinner fa-spin"></i> Loading...</p>
+    </div>
+</div>
