@@ -57,7 +57,7 @@ class MullVad(VpnHoster):
     def get_configuration(self):
         return VpnConfiguration('No user name needed',
                                 'No password needed',
-                                'Use installvpn_mullvad.py in util folder to install the VPN')
+                                'Use install_mullvad.py in util folder to install the VPN')
 
     @classmethod
     def get_options(cls):
@@ -182,3 +182,4 @@ class MullVad(VpnHoster):
             return (False, expire_date)
         else:
             return (True, expire_date)
+

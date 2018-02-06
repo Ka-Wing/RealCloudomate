@@ -19,19 +19,20 @@ from cloudomate import ethereum_wallet as E_wallet_util
 
 class coinPaymentsVpn(ABC):
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def PURCHASE_URL(self):
         """
         This function should ...
         """
 
-    @abstractproperty
+    @abstractmethod
     def COINPAYMENTS_URL(self):
         """
         This function should ...
         """
 
-    @abstractproperty
+    @abstractmethod
     def saveUserLoginFile(self):
         """
         This function should ...

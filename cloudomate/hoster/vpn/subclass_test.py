@@ -7,6 +7,13 @@ class Sub(coinPaymentsVpn):
         super().__init__()
         print("Sub class init.")
 
+    COINPAYMENTS_URL = "asdasd"
+
+    PURCHASE_URL = "asad"
+
+    def saveUserLoginFile(self):
+        pass
+
     def goToCoinPaymentsPage(self):
         print("goToCoinPaymentsPage()")
 

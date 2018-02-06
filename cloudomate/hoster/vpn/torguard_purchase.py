@@ -22,6 +22,18 @@ class torguard:
     COINPAYMENTS_URL = "https://www.coinpayments.net/index.php?cmd=checkout"
     driver = None
 
+    @staticmethod
+    def get_metadata():
+        return "TorGuard", "https://www.torguard.net/"
+
+    @staticmethod
+    def get_gateway():
+        return None
+
+    @staticmethod
+    def get_required_settings():
+        return {"user": ["username", "password"]}
+
     # Use this method for purchasing with Bitcoin.
     def retrieve_bitcoin(self, user_settings):
         try:

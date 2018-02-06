@@ -109,8 +109,8 @@ class InstallMullvad(object):
         # Delete zip file
         os.remove(files_path)
 
-if __name__ == '__main__':
-    mullvad = InstallMullvad()
-    mullvad._settings.put("user", "accountnumber", "6798499523758101")
-    mullvad._settings.save_settings()
-    mullvad._check_vpn()
+# if __name__ == '__main__':
+#     mullvad = InstallMullvad()
+#     mullvad._settings.put("user", "accountnumber", "6798499523758101")
+#     mullvad._settings.save_settings()
+#     mullvad._check_vpn()

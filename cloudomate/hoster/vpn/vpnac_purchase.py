@@ -11,6 +11,19 @@ class vpnac:
     COINPAYMENTS_URL = "https://www.coinpayments.net/index.php?cmd=checkout"
     PURCHASE_URL = "https://vpn.ac/vpn-accounts"
 
+
+    @staticmethod
+    def get_metadata():
+        return "VpnAc", "https://vpn.ac"
+
+    @staticmethod
+    def get_gateway():
+        return None
+
+    @staticmethod
+    def get_required_settings():
+        return {"user": ["username", "password"]}
+
     # Use this method for purchasing with Bitcoin.
     def retrieve_bitcoin(self, user_settings):
         try:
