@@ -18,6 +18,10 @@ if len(options_) > 1:
         print("\ninstalling pip for python 3...\n")
         test_ = os.popen('apt-get install -y python3-pip').read()
         print(test_)
+        #install setuptools
+        print("\ninstalling setuptools for python 3...\n")
+        test_ = os.popen('pip3 install setuptools').read()
+        print(test_)
         #install selenium library for python 3
         print("\ninstalling selenium for python3....\n")
         test_ = os.popen('pip3 install selenium').read()
