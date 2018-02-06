@@ -2,7 +2,6 @@
 from codecs import open
 import os
 from os import path
-from setuptools import setup, find_packages
 import sys
 
 options_ = sys.argv
@@ -12,11 +11,29 @@ if len(options_) > 1:
         print("\nstarting dependency installing process....")
         #dependecy libraries
         print("\ninstalling  python 3 dependences...\n")
-        test_ = os.popen('apt-get install libssl-dev build-essential automake pkg-config libtool libffi-dev libgmp-dev libyaml-cpp-dev').read()
+        test_ = os.popen('apt-get install -y libssl-dev').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y build-essential').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y automake').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y pkg-config').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libtool').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libffi-dev').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libgmp-dev').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libyaml-cpp-dev').read()
         print(test_)
         #install pip for python 3
         print("\ninstalling pip for python 3...\n")
         test_ = os.popen('apt-get install -y python3-pip').read()
+        print(test_)
+        #install setuptools
+        print("\ninstalling setuptools for python 3...\n")
+        test_ = os.popen('pip3 install setuptools').read()
         print(test_)
         #install selenium library for python 3
         print("\ninstalling selenium for python3....\n")
@@ -55,6 +72,8 @@ if len(options_) > 1:
         test_ = os.popen('apt-get install -y chromium-chromedriver').read()
         print(test_)
         pass
+
+from setuptools import setup, find_packages
 
 here = path.abspath(path.dirname(__file__))
 

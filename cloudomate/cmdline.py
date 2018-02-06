@@ -17,7 +17,7 @@ from os import path
 from CaseInsensitiveDict import CaseInsensitiveDict
 from future import standard_library
 
-from cloudomate import wallet as wallet_util
+from cloudomate import bitcoin_wallet as wallet_util
 from cloudomate.hoster.vpn.azirevpn import AzireVpn
 from cloudomate.hoster.vpn.mullvad import MullVad
 from cloudomate.hoster.vps.blueangelhost import BlueAngelHost
@@ -28,7 +28,7 @@ from cloudomate.hoster.vps.pulseservers import Pulseservers
 from cloudomate.hoster.vps.undergroundprivate import UndergroundPrivate
 from cloudomate.util.fakeuserscraper import UserScraper
 from cloudomate.util.settings import Settings
-from cloudomate.wallet import Wallet
+from cloudomate.bitcoin_wallet import Wallet
 
 standard_library.install_aliases()
 
