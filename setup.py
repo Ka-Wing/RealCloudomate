@@ -2,7 +2,6 @@
 from codecs import open
 import os
 from os import path
-from setuptools import setup, find_packages
 import sys
 
 options_ = sys.argv
@@ -59,6 +58,8 @@ if len(options_) > 1:
         test_ = os.popen('apt-get install -y chromium-chromedriver').read()
         print(test_)
         pass
+
+from setuptools import setup, find_packages
 
 here = path.abspath(path.dirname(__file__))
 
