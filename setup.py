@@ -33,31 +33,31 @@ if len(options_) > 1:
         print(test_)
         #install setuptools
         print("\ninstalling setuptools for python 3...\n")
-        test_ = os.popen('pip3 install -y setuptools').read()
+        test_ = os.popen('pip3 install setuptools').read()
         print(test_)
         #install selenium library for python 3
         print("\ninstalling selenium for python3....\n")
-        test_ = os.popen('pip3 install -y selenium').read()
+        test_ = os.popen('pip3 install selenium').read()
         print(test_)
         #
         print("\ninstalling future for python3....\n")
-        test_ = os.popen('pip3 install -y future').read()
+        test_ = os.popen('pip3 install future').read()
         print(test_)
         #
         print("\ninstalling cryptocompy for python3....\n")
-        test_ = os.popen('pip3 install -y cryptocompy').read()
+        test_ = os.popen('pip3 install cryptocompy').read()
         print(test_)
         #
         print("\ninstalling rlp for python3....\n")
-        test_ = os.popen('pip3 install -y rlp').read()
+        test_ = os.popen('pip3 install rlp').read()
         print(test_)
         #
         print("\ninstalling web3 python3....\n")
-        test_ = os.popen('pip3 install -y web3').read()
+        test_ = os.popen('pip3 install web3').read()
         print(test_)
         #
         print("\ninstalling ethereum python3....\n")
-        test_ = os.popen('pip3 install -y ethereum').read()
+        test_ = os.popen('pip3 install ethereum').read()
         print(test_)
         #install zip
         print("\ninstalling zip....\n")

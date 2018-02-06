@@ -104,4 +104,4 @@ def validate(bitcoin_address, magicbyte=0):
     # Encoded bytestring should be equal to the original address,
     # for example '14oLvT2' has a valid checksum, but is not a valid btc
     # address
-return bitcoin_address == encode_base58(bcbytes)
+    return bitcoin_address == encode_base58(bcbytes)
