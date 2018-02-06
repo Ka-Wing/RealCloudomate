@@ -62,8 +62,8 @@ class InstallMullvad(object):
         os.chdir("/etc/openvpn/")
 
         # Start OpenVPN connection
-        #result = os.popen("sudo nohup openvpn --config ./mullvad_se-sto.conf > /dev/null &").read()
-        result = os.popen("sudo service openvpn start").read()
+        result = os.popen("sudo nohup openvpn --config ./mullvad_se-sto.conf > /dev/null &").read()
+        #result = os.popen("sudo service openvpn start").read()
         print(result)
 
         # Sleep for 10 seconds, so that VPN connection can be established in the
