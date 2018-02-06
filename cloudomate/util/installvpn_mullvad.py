@@ -23,6 +23,8 @@ class InstallMullvad(object):
     CONFIGURATION_URL = "https://mullvad.net/en/download/config/"
     TESTING_URL = "https://am.i.mullvad.net/json"
 
+    c_vpn_config_dir = os.path.dirname(os.path.realpath(__file__)) + '/mullvad_openvpn_config_files'
+
     def __init__(self):
         self._browser = StatefulBrowser(user_agent="Firefox")
         self._settings = Settings()
@@ -40,23 +42,28 @@ class InstallMullvad(object):
             if setup:
                 print("Error: VPN was not installed!")
             else:
+                try:
+                    self._settings.get("user", "accountnumber")
+                except Exception as e:
+                    print("Error: Account not found, please purchase one!")
+                    print(self._error_message(e))
                 self.setup_vpn()
 
-                # Automatically sets up VPN with settings from provider
-
+    # Automatically sets up VPN with settings from provider
     def setup_vpn(self):
         # Get the necessary files for connecting to the VPN service
         self._download_files()
+        result = os.popen("sudo chmod -R 777 " + self.c_vpn_config_dir)
 
         # Copy files to OpenVPN folder
-        result = os.popen("sudo cp -a ./config-files/. /etc/openvpn/").read()
+        result = os.popen("sudo cp -a " + self.c_vpn_config_dir + "/. /etc/openvpn/").read()
         print(result)
 
         os.chdir("/etc/openvpn/")
 
         # Start OpenVPN connection
-        result = os.popen(
-            "sudo nohup openvpn --config ./mullvad_se-sto.conf > /dev/null &").read()
+        #result = os.popen("sudo nohup openvpn --config ./mullvad_se-sto.conf > /dev/null &").read()
+        result = os.popen("sudo service openvpn start").read()
         print(result)
 
         # Sleep for 10 seconds, so that VPN connection can be established in the
@@ -78,16 +85,16 @@ class InstallMullvad(object):
         content = response.content
 
         # Create the folder that will store the configuration files
-        result = os.popen("mkdir config-files").read()
-        print(result)
+        if os.path.isdir(self.c_vpn_config_dir) == False:
+            os.popen('mkdir ' + self.c_vpn_config_dir).read()
 
         # Download the zip file to the right location
-        files_path = "./config-files/config.zip"
+        files_path = self.c_vpn_config_dir + "/config.zip"
         with open(files_path, "wb") as output:
             output.write(content)
 
         # Unzip files
-        zip_file = zipfile.ZipFile(files_path, "r")
+        zip_file = zipfile.ZipFile(files_path, 'r')
         for member in zip_file.namelist():
             filename = os.path.basename(member)
             # Skip directories
@@ -96,8 +103,14 @@ class InstallMullvad(object):
 
             # Copy file (taken from zipfile's extract)
             source = zip_file.open(member)
-            target = open(os.path.join("./config-files/", filename), "wb")
+            target = open(os.path.join(self.c_vpn_config_dir, filename), "wb")
             with source, target:
                 shutil.copyfileobj(source, target)
         # Delete zip file
         os.remove(files_path)
+
+if __name__ == '__main__':
+    mullvad = InstallMullvad()
+    mullvad._settings.put("user", "accountnumber", "6798499523758101")
+    mullvad._settings.save_settings()
+    mullvad._check_vpn()
