@@ -5,45 +5,44 @@ import re
 import os
 import requests
 from selenium import webdriver
-from abc import ABC, abstractmethod, abstractproperty
 import sys
 from cloudomate.util.captcha_account_manager import captchaAccountManager
-
+from abc import ABC, abstractmethod, abstractproperty
 from cloudomate.bitcoin_wallet import Wallet as BitcoinWallet
 # from cloudomate.litcoin_wallet import Wallet as LitcoinWallet
 from cloudomate.ethereum_wallet import Wallet as EthereumWallet
-
 from cloudomate import bitcoin_wallet as B_wallet_util
 # from cloudomate import litcoin_wallet as L_wallet_util
 from cloudomate import ethereum_wallet as E_wallet_util
 
-class coinPaymentsVpn(ABC):
 
-    @property
+class coinpaymentsVpnProvider(ABC):
+
     @abstractmethod
     def PURCHASE_URL(self):
-        """
-        This function should ...
-        """
+        pass
 
     @abstractmethod
     def COINPAYMENTS_URL(self):
-        """
-        This function should ...
-        """
+        pass
 
     @abstractmethod
     def saveUserLoginFile(self):
-        """
-        This function should ...
-        """
+        pass
+
+    @abstractmethod
+    def vpnProviderName(self):
+        pass
+
+    @abstractmethod
+    def vpnProviderBaseUrl(self):
+        pass
 
     driver = None
 
     # Creates an invoice that for a vpn service that requires Bitcoin payment (Returns the "BTC amount" and the "BTC address" to which the "BTC amount" needs to be send).
     def retrieve_bitcoin(self, user_settings):
         try:
-            self.goToCoinPaymentsPage(["bitcoin", "BTC"], user_setting)
             return self._retrieve_payment_info(["bitcoin", "BTC"], user_settings)
         except Exception as e:
             print(self._error_message(e))
@@ -51,7 +50,6 @@ class coinPaymentsVpn(ABC):
     # Use this method for purchasing with Litecoin.
     def retrieve_litecoin(self, user_settings):
         try:
-            self.goToCoinPaymentsPage(["bitcoin", "BTC"], user_setting)
             return self._retrieve_payment_info(["litecoin", "LTC"], user_settings)
         except Exception as e:
             print(self._error_message(e))
@@ -60,7 +58,6 @@ class coinPaymentsVpn(ABC):
     # Retrieving Ethereum at the final page is different than for the other currencies.
     def retrieve_ethereum(self, user_settings):
         try:
-            self.goToCoinPaymentsPage(["bitcoin", "BTC"], user_setting)
             return self._retrieve_payment_info(["ethereum", "ETH"], user_settings)
         except Exception as e:
             print(self._error_message(e))
@@ -111,57 +108,17 @@ class coinPaymentsVpn(ABC):
         # self.driver = webdriver.Chrome()
         self.driver.maximize_window()
 
+
     @abstractmethod
     def goToCoinPaymentsPage(self):
-        """
-        This function should browse to the coinpayments page.
-        """
+        pass
 
     # Don't invoke this method directly.
     def _retrieve_payment_info(self, currency, user_settings):
 
+        self.goToCoinPaymentsPage()
+
         print("Placing an order.")
-
-        # Puts VPN in cart and checks out.
-        self.driver.get(self.PURCHASE_URL)
-
-        self.driver.find_element_by_css_selector("button[type='button'][value='Order Now']").click()
-        time.sleep(1)
-        self.driver.find_element_by_css_selector("button[type='submit'][value='add to cart & checkout »']").click()
-        time.sleep(1)
-        self.driver.find_element_by_css_selector("button.btn.btn-success").click()
-        time.sleep(1)
-
-        # Filing in order form.
-        self.driver.find_element_by_css_selector("input[type='radio'][value='coinpayments']").click()
-        time.sleep(1)
-
-        # Logs in if already registered, else register.
-        if user_settings.get("registered") == "1":
-            self.driver.find_element_by_css_selector("a[href='/cart.php?a=login']").click()
-            time.sleep(1)
-            self.driver.find_element_by_xpath('//*[@id="loginfrm"]/div[1]/div/input'). \
-                send_keys(user_settings.get("email"))
-            self.driver.find_element_by_xpath('//*[@id="loginfrm"]/div[2]/div/input'). \
-                send_keys(user_settings.get("password"))
-        else:
-            self.driver.find_element_by_xpath('//*[@id="signupfrm"]/div[1]/div/input'). \
-                send_keys(user_settings.get("email"))
-            self.driver.find_element_by_xpath('//*[@id="newpw"]'). \
-                send_keys(user_settings.get("password"))
-            self.driver.find_element_by_xpath('//*[@id="signupfrm"]/div[4]/div/input'). \
-                send_keys(user_settings.get("password"))
-            self.driver.find_element_by_xpath('//*[@id="signupfrm"]/div[6]/div/input'). \
-                send_keys("Blockchain life")
-
-        self.driver.find_element_by_id("accepttos").click()
-        self.driver.find_element_by_css_selector("input[type='submit'][value='Complete Order »']").click()
-        time.sleep(1)
-
-        # Set registered to 1 so during any purchase in the future, the script will log in instead of registering.
-        if user_settings.get("registered") == "0":
-            pass
-
         print("Retrieving the amount and address.")
 
         # Continue to the final page.
@@ -249,21 +206,3 @@ class coinPaymentsVpn(ABC):
         tempfile.write(file_contents)
         tempfile.close()
         pass
-
-"""
-if __name__ == '__main__':
-    tg = torguard()
-    user_settings = {"email": "ralphie_ozxcd@hotmail.com", "password": "Chicker1$", "registered": "1"}
-    dict = tg.retrieve_ethereum(user_settings)
-    print(dict['amount'])
-    print(dict['address'])
-    # walletTest = LitcoinWallet()
-    # tg.pay(dict['amount'],dict['address'],'LTC',walletTest)
-    walletTest = EthereumWallet()
-    print(str(walletTest.get_balance()))
-    tg.pay(dict['amount'], dict['address'], 'ETH', walletTest)
-
-    # wait for the site to deliver the service after payment
-    time.sleep(70)
-    tg.saveLoginAfterPurchase(user_settings['email'], user_settings['password'])
-"""
