@@ -8,69 +8,69 @@ options_ = sys.argv
 
 if len(options_) > 1:
     if options_[1] == 'install':
-        # print("\nstarting dependency installing process....")
-        # #dependecy libraries
-        # print("\ninstalling  python 3 dependences...\n")
-        # test_ = os.popen('apt-get install -y libssl-dev').read()
-        # print(test_)
-        # test_ = os.popen('apt-get install -y build-essential').read()
-        # print(test_)
-        # test_ = os.popen('apt-get install -y automake').read()
-        # print(test_)
-        # test_ = os.popen('apt-get install -y pkg-config').read()
-        # print(test_)
-        # test_ = os.popen('apt-get install -y libtool').read()
-        # print(test_)
-        # test_ = os.popen('apt-get install -y libffi-dev').read()
-        # print(test_)
-        # test_ = os.popen('apt-get install -y libgmp-dev').read()
-        # print(test_)
-        # test_ = os.popen('apt-get install -y libyaml-cpp-dev').read()
-        # print(test_)
-        # #install pip for python 3
-        # print("\ninstalling pip for python 3...\n")
-        # test_ = os.popen('apt-get install -y python3-pip').read()
-        # print(test_)
-        # #install setuptools
-        # print("\ninstalling setuptools for python 3...\n")
-        # test_ = os.popen('pip3 install setuptools').read()
-        # print(test_)
-        # #install selenium library for python 3
-        # print("\ninstalling selenium for python3....\n")
-        # test_ = os.popen('pip3 install selenium').read()
-        # print(test_)
-        # #
-        # print("\ninstalling future for python3....\n")
-        # test_ = os.popen('pip3 install future').read()
-        # print(test_)
-        # #
-        # print("\ninstalling cryptocompy for python3....\n")
-        # test_ = os.popen('pip3 install cryptocompy').read()
-        # print(test_)
-        # #
-        # print("\ninstalling rlp for python3....\n")
-        # test_ = os.popen('pip3 install rlp').read()
-        # print(test_)
-        # #
-        # print("\ninstalling web3 python3....\n")
-        # test_ = os.popen('pip3 install web3').read()
-        # print(test_)
-        # #
-        # print("\ninstalling ethereum python3....\n")
-        # test_ = os.popen('pip3 install ethereum').read()
-        # print(test_)
-        # #install zip
-        # print("\ninstalling zip....\n")
-        # test_ = os.popen('apt-get install -y zip').read()
-        # print(test_)
-        # #install openvpn
-        # print("\ninstalling openvpn....\n")
-        # test_ = os.popen('apt-get install -y openvpn').read()
-        # print(test_)
-        # #install chromedriver
-        # print("\ninstalling chromedriver....\n")
-        # test_ = os.popen('apt-get install -y chromium-chromedriver').read()
-        # print(test_)
+        print("\nstarting dependency installing process....")
+        #dependecy libraries
+        print("\ninstalling  python 3 dependences...\n")
+        test_ = os.popen('apt-get install -y libssl-dev').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y build-essential').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y automake').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y pkg-config').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libtool').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libffi-dev').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libgmp-dev').read()
+        print(test_)
+        test_ = os.popen('apt-get install -y libyaml-cpp-dev').read()
+        print(test_)
+        #install pip for python 3
+        print("\ninstalling pip for python 3...\n")
+        test_ = os.popen('apt-get install -y python3-pip').read()
+        print(test_)
+        #install setuptools
+        print("\ninstalling setuptools for python 3...\n")
+        test_ = os.popen('pip3 install setuptools').read()
+        print(test_)
+        #install selenium library for python 3
+        print("\ninstalling selenium for python3....\n")
+        test_ = os.popen('pip3 install selenium').read()
+        print(test_)
+        #
+        print("\ninstalling future for python3....\n")
+        test_ = os.popen('pip3 install future').read()
+        print(test_)
+        #
+        print("\ninstalling cryptocompy for python3....\n")
+        test_ = os.popen('pip3 install cryptocompy').read()
+        print(test_)
+        #
+        print("\ninstalling rlp for python3....\n")
+        test_ = os.popen('pip3 install rlp').read()
+        print(test_)
+        #
+        print("\ninstalling web3 python3....\n")
+        test_ = os.popen('pip3 install web3').read()
+        print(test_)
+        #
+        print("\ninstalling ethereum python3....\n")
+        test_ = os.popen('pip3 install ethereum').read()
+        print(test_)
+        #install zip
+        print("\ninstalling zip....\n")
+        test_ = os.popen('apt-get install -y zip').read()
+        print(test_)
+        #install openvpn
+        print("\ninstalling openvpn....\n")
+        test_ = os.popen('apt-get install -y openvpn').read()
+        print(test_)
+        #install chromedriver
+        print("\ninstalling chromedriver....\n")
+        test_ = os.popen('apt-get install -y chromium-chromedriver').read()
+        print(test_)
         pass
 
 from setuptools import setup, find_packages
