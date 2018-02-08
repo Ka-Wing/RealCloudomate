@@ -7,28 +7,28 @@ import time
 
 class torguardServiceRetriever():
 
-    c_userpass_dir = os.path.dirname(os.path.realpath(__file__)) + '/torguard_open_vpn_userpass'
+    c_userpass_dir =  os.path.expanduser("~") + '/.config/torguard_open_vpn_userpass'
 
-    userpass_file_name = 'user.txt'
+    userpass_file_name = 'torguard_openvpn_service_auth.txt'
 
     #username en passw for open vpn: NOTE these are NOT THE SAME as vpnac-web login credentials
-    vpnusern_ = '-'
-    vpnpassw_ = '-'
+    vpnusern_ = None
+    vpnpassw_ = None
 
     vpn_config_password_to_be_set = 'Test_12345'
 
     #arguments username and password are required by openvpn service
-    def __init__(self,wlogin_user = '-',wlogin_passw = '-'):
+    def __init__(self,wlogin_user = None,wlogin_passw = None):
 
         # Sets up Selenium
         self._driver_setup()
 
-        if wlogin_user != '-' and wlogin_passw != '-':
+        if wlogin_user != None and wlogin_passw != None:
             self.extractOpenVpnUserInfo(wlogin_user, wlogin_passw)
             return
             pass
 
-        web_login_file = os.path.dirname(os.path.realpath(__file__)) + '/torguard_login.txt'
+        web_login_file =  os.path.expanduser("~") + '/.config/torguard_login.txt'
         if os.path.isfile(web_login_file):
             file = open(web_login_file,"r")
             lines = file.readlines()
@@ -54,7 +54,7 @@ class torguardServiceRetriever():
             os.popen('mkdir ' + self.c_userpass_dir).read()
             pass
         file_test = self.c_userpass_dir + '/' + self.userpass_file_name
-        self.saveTofile(self.vpnusern_ + "\n" + self.vpnpassw_,file_test)
+       # self.saveTofile(self.vpnusern_ + "\n" + self.vpnpassw_,file_test)
         pass
 
     def saveTofile(self, file_contents, full_file_path):
@@ -88,7 +88,9 @@ class torguardServiceRetriever():
         options.add_argument('headless')
         options.add_argument('disable-gpu')
         options.add_argument('window-size=1920,1080')
-        self.driver = webdriver.Chrome(chrome_options=options)
+        #TODO fix hardcoded executable_path
+        self.driver = webdriver.Chrome(executable_path="/home/kw/chromedriver_linux64/chromedriver",
+                                       chrome_options=options)
         self.driver.maximize_window()
 
     def if_active_service(self):
@@ -106,30 +108,19 @@ class torguardServiceRetriever():
 
         self.driver.find_element_by_xpath("//select[@name='itemlimit']/option[text()='100']").click()
 
-        service_index = 1
-
         # Find an active service, then click on manage credentials.
+        service_index = 1
         while True:
             try:
-                if service_index == 1:
-                    try:
-                        # If this element is found, it means there is only one service.
-                        element = self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div["
-                                                                    "4]/table/tbody/tr/td[5]/span")
-                        if str(element.text) == "Active":
-                            self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr/td["
-                                                              "6]/div/a").click()
-                            self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr/td["
-                                                              "6]/div/ul/li[3]/a").click()
-                        return True
-                    except Exception:
-                        pass
+                # If this element is found, it means there is only one service.
+                element = self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
+                                                            str(service_index) + "]/td[5]/span")
 
-                if element.text == "active":
-                    self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody[" +
-                                                      service_index + "]/tr/td[6]/div/a").click()
-                    self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody[" +
-                                                      service_index + "]/tr/td[6]/div/ul/li[3]/a").click()
+                if element.text == "Active":
+                    self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
+                                                      str(service_index) + "]/td[6]/div/a").click()
+                    self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
+                                                      str(service_index) + "]/td[6]/div/ul/li[3]/a").click()
 
                     return True
                 service_index = service_index + 1
@@ -189,6 +180,30 @@ class torguardServiceRetriever():
         except Exception:
             pass
 
+    def getValidUntil(self):
+        if(self.driver.current_url != "https://torguard.net/clientarea.php?action=products"):
+            self.driver.get("https://torguard.net/clientarea.php?action=products")
+
+        if not self._get_logged_in():
+            self._login()
+            self.driver.get("https://torguard.net/clientarea.php?action=products")
+
+        self.driver.find_element_by_xpath("//select[@name='itemlimit']/option[text()='100']").click()
+
+        # Find an active service, then scrape the due date.
+        service_index = 1
+        while True:
+            try:
+                element = self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
+                                                            str(service_index) + "]/td[5]/span")
+
+                if element.text == "Active":
+                    return self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
+                                                            str(service_index) + "]/td[4]").text
+                service_index = service_index + 1
+            except Exception:
+                return "00/00/0000"
+
     def _change_password(self, password):
         if self.driver.current_url != "https://torguard.net/managecredentials.php":
             raise Exception("Driver did not detect the manage credentials page.")
@@ -216,4 +231,6 @@ class torguardServiceRetriever():
 
 if __name__ == '__main__':
     vpntoruguardretriever = torguardServiceRetriever()
+    print(vpntoruguardretriever.getValidUntil())
+    vpntoruguardretriever._manage_credentials_of_active_service()
     #test with existing web (non purchased trough script) credentials: vpntoruguardretriever = torguardServiceRetriever("mohamed.amine.legheraba@gmail.com", "djamel75018")
