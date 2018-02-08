@@ -1,3 +1,5 @@
+from selenium.common.exceptions import NoSuchElementException
+
 from cloudomate.hoster.vpn.coinpayments_vpn_provider import coinpaymentsVpnProvider
 import time
 from cloudomate.bitcoin_wallet import Wallet as BitcoinWallet
@@ -48,9 +50,9 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
         try:
             errorbox = self.driver.find_element_by_class_name("errorbox")
             error_message = True
-        except Exception:
-            # If class name not found, then there are no errors.
-         pass
+        except NoSuchElementException:
+            pass # No errors found.
+
         if error_message:
             print("Website returned an error during order placing: \"" + errorbox.text + "\"")
             exit(0)
@@ -59,10 +61,6 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
         if (user_settings.get("registration") == "0"):
             pass  # Change registration to 1 for ever.
 
-
-    def test(self):
-        print("\ntest")
-        pass
 
 
 if __name__ == '__main__':

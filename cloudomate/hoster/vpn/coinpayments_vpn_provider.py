@@ -6,6 +6,9 @@ import os
 import requests
 from selenium import webdriver
 import sys
+
+from selenium.common.exceptions import NoSuchElementException
+
 from cloudomate.util.captcha_account_manager import captchaAccountManager
 from abc import ABC, abstractmethod, abstractproperty
 from cloudomate.bitcoin_wallet import Wallet as BitcoinWallet
@@ -88,9 +91,9 @@ class coinpaymentsVpnProvider(ABC):
 
         # Selenium setup: headless Chrome, Window size needs to be big enough, otherwise elements will not be found.
         options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('disable-gpu');
-        options.add_argument('window-size=1920,1080');
+        #options.add_argument('headless')
+        #options.add_argument('disable-gpu');
+        #options.add_argument('window-size=1920,1080');
 
         connection_reset = True
         while connection_reset:
@@ -132,22 +135,63 @@ class coinpaymentsVpnProvider(ABC):
                 "\n\n(You can specify whether the given  email is already registered as a parameter in the user settings for the script) \n")
             print("\nTry again with the approproate settings")
             print("\n\n*************************************************************************************\n")
-        self.driver.find_element_by_id("coins_" + currency[1]).click()
+
+        try:
+            self.driver.find_element_by_id("coins_" + currency[1]).click()
+            pass
+        except NoSuchElementException:
+            print("The service provider does not accept " + currency[1] + " (anymore).")
+            sys.exit(0)
+
         self.driver.find_element_by_id("dbtnCheckout").click()
+
+        # See if any error messages are returned.
+        error_available = False
+        try:
+            error_message = self.driver.find_element_by_xpath('//*[@id="coform"]/div[1]/div').text
+            error_available = True
+        except NoSuchElementException:
+            pass # No error found
+
+        if error_available:
+            print("Error message returned from coinpayments.net: \"" + error_message + "\"")
+            sys.exit(0)
+
 
         tries = 0
         while not (self.driver.current_url == self.COINPAYMENTS_URL):
+            try:
+                error_message = self.driver.find_element_by_xpath("/html/body/div/div/div[2]").text
+                if "3 unfinished" in error_message:
+                    print("You already have 3 unfinished transfers with coinpayments.net from within the last "
+                      "24 hours and therefore you cannot create anymore orders..")
+                    exit(0)
+            except NoSuchElementException:
+                pass
+
             tries = tries + 1
             time.sleep(2)
             if tries > 10:
-                raise Exception("You probably already have 3 unfinished transfers with coinpayments.net from within "
-                                "the last 24 hours and you therefore cannot create anymore.")
+                #TODO do timeout.
+                sys.exit(0)
 
         time.sleep(2)
 
         amount = ""
         address = ""
 
+        try:
+            address = self.driver.find_element_by_xpath('//*[@id="email-form"]/div[2]/div[1]/div[3]/div[2]').text
+            print("address: " + address)
+        except NoSuchElementException:
+            pass
+
+        try:
+            amount = self.driver.find_element_by_xpath('//*[@id="email-form"]/div[2]/div[1]/div[1]').text
+        except NoSuchElementException:
+            pass
+
+        # Using page source to find address and amount because elements will not be found.
         page = self.driver.page_source
         address_re = ""
         amount_re = ""

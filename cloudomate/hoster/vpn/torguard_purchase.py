@@ -1,3 +1,5 @@
+from selenium.common.exceptions import NoSuchElementException
+
 from cloudomate.hoster.vpn.coinpayments_vpn_provider import coinpaymentsVpnProvider
 import time
 from cloudomate.bitcoin_wallet import Wallet as BitcoinWallet
@@ -59,9 +61,8 @@ class torguardVPNPurchaser(coinpaymentsVpnProvider):
         try:
             error_message = self.driver.find_element_by_class_name("alert-danger").text
             error_available = True
-        except Exception:
-            # If class name not found, then there are no errors.
-         pass
+        except NoSuchElementException:
+            pass # No errors found
         if error_available:
             print("Website returned an error during order placing: \"" + error_message + "\"")
             exit(0)
