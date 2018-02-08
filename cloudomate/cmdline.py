@@ -93,6 +93,9 @@ def execute(cmd=sys.argv[1:]):
     add_vpn_status(subparsers)
     add_vpn_turn_on(subparsers)
     add_vpn_turn_off(subparsers)
+    add_agent_status_notifier(subparsers)
+    add_agent_status_notifier(subparsers)
+    add_captcha_manager(subparsers)
 
     subparsers.required = True
 
@@ -103,8 +106,8 @@ def add_vpn_purchase(subparsers):
     parser_purchase = subparsers.add_parser("vpn-purchase", help="Purchase VPN")
     parser_purchase.set_defaults(func=vpn_purchase)
     parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
-    parser_purchase.add_argument("--coin", help="Choose the cryptocurrency used for puchasing.")
-    parser_purchase.add_argument("--feemultiplier", help="Choose the cryptocurrency used for puchasing.")
+    parser_purchase.add_argument("--coin", help="Choose the cryptocurrency used for purchasing.")
+    parser_purchase.add_argument("--feemultiplier", help="Choose the fee used for purchasing.")
     parser_purchase.add_argument("--accountnr", help="Choose the cryptocurrency used for purchasing.")
     parser_purchase.add_argument("--username", help="Choose the username.")
     parser_purchase.add_argument("--password", help="Choose the password.")
@@ -126,6 +129,90 @@ def add_vpn_turn_off(subparsers):
     parser_purchase = subparsers.add_parser("vpn-status", help="Check VPN status")
     parser_purchase.set_defaults(func=vpn_turn_off)
     parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+
+def add_agent_status_notifier(subparsers):
+    vpn_parsers = subparsers.add_parser("vpn_bitcoin")
+    vpn_parsers.set_defaults(type="vpn_bitcoin")
+    vpn_subparsers = vpn_parsers.add_subparsers(dest="command")
+    vpn_subparsers.required = True
+
+def add_vpn_parsers_bitcoin(subparsers):
+    vpn_parsers = subparsers.add_parser("vpn_bitcoin")
+    vpn_parsers.set_defaults(type="vpn_bitcoin")
+    vpn_subparsers = vpn_parsers.add_subparsers(dest="command")
+    vpn_subparsers.required = True
+
+    parser_list = vpn_subparsers.add_parser("list", help="List %s providers" % provider_type.upper())
+    parser_list.set_defaults(func=list_providers)
+    add_parser_options(vpn_subparsers, "vpn_bitcoin")
+    add_parser_purchase(vpn_subparsers, "vpn_bitcoin")
+    add_parser_status(vpn_subparsers, "vpn_bitcoin")
+    parser_ssh = vpn_subparsers.add_parser("ssh", help="SSH into an active service")
+    parser_ssh.add_argument("provider", help="The specified provider", nargs="?", choices=providers['vps_bitcoin'])
+
+def add_agent_status_notifier(subparser):
+    parser_captcha = subparser.add_parser("agent-status-notifier", help="Status notifier of agent.")
+    parser_captcha.set_defaults(type="agent_status_notifier")
+    subparser_captcha = parser_captcha.add_subparsers(dest="command") #, help="Get account details"
+    subparser_captcha.required = True
+
+    status_parser = subparser_captcha.add_parser("status", help ="Get status of the notifier")
+    status_parser.set_defaults(func=notifier_status)
+
+    turnon_parser = subparser_captcha.add_parser("turnon", help ="Turn on the status notifier")
+    turnon_parser.set_defaults(func=turnon_notifier)
+    turnon_parser.add_argument("minutes", help="Amount of minutes.", type=int)
+
+    turnoff_parser = subparser_captcha.add_parser("turnoff", help="Turn off the status notifier.")
+    turnoff_parser.set_defaults(func=turnoff_notifier)
+
+
+def add_captcha_manager(subparser):
+    parser_captcha = subparser.add_parser("captcha-manager", help="Manager of the captcha account.")
+    parser_captcha.set_defaults(type="captcha_manager")
+    subparser_captcha = parser_captcha.add_subparsers(dest="command")
+    subparser_captcha.required = True
+
+    view_amount_parser = subparser_captcha.add_parser("view-account", help ="Get account details")
+    view_amount_parser.set_defaults(func=captcha_manager)
+
+    get_balance_parser = subparser_captcha.add_parser("get-balance", help ="Get current balance")
+    get_balance_parser.set_defaults(func=captcha_get_balance)
+
+    reload_parser = subparser_captcha.add_parser("reload", help="Top up balance for anticaptcha account.")
+    reload_parser.add_argument("amount", help="The amount to top up.")
+    reload_parser.add_argument("--coin", help="The cryptocurrency to pay with.", default="btc")
+    reload_parser.add_argument("--feemultiplier", help="Choose the fee used for purchasing.")
+    reload_parser.set_defaults(func=captcha_reload)
+    pass
+
+def turnon_notifier(args):
+    print("turnon_notifier()")
+    print(args)
+    print(args.minutes)
+    print(type(args.minutes))
+
+def turnoff_notifier(args):
+    print("turnoff_notifier()")
+    print(args)
+
+
+def notifier_status(args):
+    print("notifier_status()")
+    print(args)
+
+def captcha_get_balance(args):
+    print("captcha_get_balance()")
+    print(args)
+
+def captcha_reload(args):
+    print("captcha_reload()")
+    print(args)
+    pass
+
+def captcha_manager(args):
+    print("captcha_manager()")
+    print(args)
 
 def vpn_purchase(args):
     print(args)
