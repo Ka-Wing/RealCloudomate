@@ -17,8 +17,22 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
 
     saveUserLoginFile = os.path.expanduser("~") + '/.config/vpnac_login.txt'
 
+    # TODO redundant
     vpnProviderName = "vpn.ac"
     vpnProviderBaseUrl = "https://vpn.ac"
+
+    @staticmethod
+    def get_metadata():
+        return "TorGuard", "https://www.torguard.net/"
+
+    @staticmethod
+    def get_gateway():
+        return None
+
+    @staticmethod
+    def get_required_settings():
+        return {"user": ["username", "password"]}
+
 
     def goToCoinPaymentsPage(self):
         self.driver.get(self.PURCHASE_URL)

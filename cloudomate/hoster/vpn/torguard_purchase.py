@@ -17,8 +17,21 @@ class torguardVPNPurchaser(coinpaymentsVpnProvider):
 
     saveUserLoginFile = os.path.expanduser("~") + '/.config/torguard_login.txt'
 
+    #TODO redundant
     vpnProviderName = "Torguard"
     vpnProviderBaseUrl = "https://torguard.net"
+
+    @staticmethod
+    def get_metadata():
+        return "TorGuard", "https://www.torguard.net/"
+
+    @staticmethod
+    def get_gateway():
+        return None
+
+    @staticmethod
+    def get_required_settings():
+        return {"user": ["username", "password"]}
 
     def goToCoinPaymentsPage(self):
         # Puts VPN in cart and checks out.
