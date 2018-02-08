@@ -10,6 +10,7 @@ import requests
 import os
 import time
 import zipfile
+import sys
 
 from mechanicalsoup import StatefulBrowser
 from future import standard_library
@@ -43,10 +44,11 @@ class InstallMullvad(object):
                 print("Error: VPN was not installed!")
             else:
                 try:
-                    self._settings.get("user", "accountnumber")
+                    self._settings.get("Mullvad", "accountnumber")
                 except Exception as e:
                     print("Error: Account not found, please purchase one!")
-                    print(self._error_message(e))
+                    #print(self._error_message(e))
+                    sys.exit(1)
                 self.setup_vpn()
 
     # Automatically sets up VPN with settings from provider
@@ -76,7 +78,7 @@ class InstallMullvad(object):
         # Fill information on website to get right files for openVPN
         self._browser.open(self.CONFIGURATION_URL)
         form = self._browser.select_form()
-        form["account_token"] = self._settings.get("user", "accountnumber")
+        form["account_token"] = self._settings.get("Mullvad", "accountnumber")
         form["platform"] = "linux"
         form["region"] = "se-sto"
         form["port"] = "0"
@@ -111,6 +113,6 @@ class InstallMullvad(object):
 
 # if __name__ == '__main__':
 #     mullvad = InstallMullvad()
-#     mullvad._settings.put("user", "accountnumber", "6798499523758101")
+#     mullvad._settings.put("Mullvad", "accountnumber", "6798499523758101")
 #     mullvad._settings.save_settings()
 #     mullvad._check_vpn()
