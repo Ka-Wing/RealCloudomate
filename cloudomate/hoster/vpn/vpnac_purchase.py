@@ -19,7 +19,6 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
     vpnProviderBaseUrl = "https://vpn.ac"
 
     def goToCoinPaymentsPage(self):
-        # Puts VPN in cart and checks out.
         self.driver.get(self.PURCHASE_URL)
         self.driver.find_element_by_xpath('//*[@id="content"]/main/article[1]/div/div[1]/div[1]/div/div[3]/a').click()
         time.sleep(1)
@@ -31,8 +30,7 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
                 send_keys(user_settings.get("email"))
             self.driver.find_element_by_xpath('//*[@id="loginfrm"]/table/tbody/tr[2]/td[2]/input'). \
                 send_keys(user_settings.get("password"))
-            self.driver.find_element_by_xpath('//*[@id="pgbtncoinpayments"]').click()
-            time.sleep(1)
+
         else:
             self.driver.find_element_by_xpath('//*[@id="signupfrm"]/table/tbody/tr[3]/td[2]/input'). \
                 send_keys(user_settings.get("email"))
@@ -40,23 +38,27 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
             self.driver.find_element_by_xpath('//*[@id="signupfrm"]/table/tbody/tr[5]/td[2]/input'). \
                 send_keys(user_settings.get("password"))
 
+        time.sleep(1)
+        self.driver.find_element_by_xpath('//*[@id="pgbtncoinpayments"]').click()
+        time.sleep(1)
         self.driver.find_element_by_xpath('//*[@id="whmcsorderfrm"]/div[4]/input').click()
 
+        # Checks if any error message can be found on the webpage. If so, print error message.
+        error_message = False
         try:
             errorbox = self.driver.find_element_by_class_name("errorbox")
-            raise Exception(errorbox.text)
+            error_message = True
         except Exception:
             #If class name not found, then there are no errors.
             pass
+        if error_message:
+            print("Error during placing order: \"" + errorbox.text + "\"")
+            exit(0)
 
         time.sleep(2)
-
-        print("Retrieving the amount and address.")
-
         if (user_settings.get("registration") == "0"):
             pass  # Change registration to 1 for ever.
 
-        print("\nBrowsing to payment page")
 
     def test(self):
         print("\ntest")
@@ -65,7 +67,7 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
 
 if __name__ == '__main__':
     vpnac = vpnacVPNPurchaser()
-    user_settings = {"email": "mohamestest232westesttest@gmail.com", "password": "sfdjlsdmfsdlfkTest_12312", "registered": "0"}
+    user_settings = {"email": "mohamestest232westesttest@gmail.com", "password": "sfdjlsdmfsdlfkTest_12312", "registered": "1"}
     vpnac.goToCoinPaymentsPage()
     # b = vpnac.retrieve_ethereum(user_settings)
     # print(b['amount'])

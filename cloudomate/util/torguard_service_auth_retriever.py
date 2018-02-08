@@ -22,7 +22,6 @@ class torguardServiceRetriever():
 
         # Sets up Selenium
         self._driver_setup()
-        self._login("mohamed.amine.legheraba@gmail.com", "djamel75018")
 
         if wlogin_user != None and wlogin_passw != None:
             self.extractOpenVpnUserInfo(wlogin_user, wlogin_passw)
@@ -112,6 +111,7 @@ class torguardServiceRetriever():
             self.driver.get("https://torguard.net/clientarea.php?action=products")
 
         if not self._get_logged_in():
+            #TODO Needs fix.
             self._login()
             self.driver.get("https://torguard.net/clientarea.php?action=products")
 
@@ -145,6 +145,7 @@ class torguardServiceRetriever():
             self.driver.switch_to.alert().accept()
             self.driver.find_element_by_xpath()
 
+            #TODO What is this?
             tries = 0
             info = ""
             while tries < 5:
@@ -194,6 +195,7 @@ class torguardServiceRetriever():
             self.driver.get("https://torguard.net/clientarea.php?action=products")
 
         if not self._get_logged_in():
+            #TODO Needs fix
             self._login()
             self.driver.get("https://torguard.net/clientarea.php?action=products")
 

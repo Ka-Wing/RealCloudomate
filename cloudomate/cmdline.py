@@ -79,6 +79,8 @@ def execute(cmd=sys.argv[1:]):
     add_vpn_parsers_bitcoin(subparsers)
     add_vps_parsers_ethereum(subparsers)
     add_vpn_parsers_ethereum(subparsers)
+    add_install_vpn(subparsers)
+    neuken(subparsers)
     subparsers.required = True
 
     args = parser.parse_args(cmd)
@@ -141,6 +143,28 @@ def add_vps_parsers_ethereum(subparsers):
     add_parser_vps_get_ip(vps_subparsers)
     add_parser_vps_ssh(vps_subparsers)
     add_parser_info(vps_subparsers, "vps_ethereum")
+
+def neuken(subparsers):
+    vps_parsers = subparsers.add_parser("neuken")
+    vps_parsers.set_defaults(type="neuken")
+    vps_subparsers = vps_parsers.add_subparsers(dest="command")
+    vps_subparsers.required = False
+
+    #neuken_subparser(vps_subparsers)
+
+    vps_parsers.set_defaults(func=hallo)
+
+def neuken_subparser():
+    pass
+
+
+def hallo(self):
+    #testWallet = EthereumWallet()
+    #testWallet.address
+    print("Hallo")
+    print(ethereum_wallet_util.get_network_fee())
+
+
 
 def add_install_vpn(subparsers):
     vpn_parsers = subparsers.add_parser("install_vpn")
