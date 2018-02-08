@@ -300,15 +300,15 @@ def add_parser_wallet_getaddress(subparsers):
     pass
 
 def add_parser_wallet_getprivatekey(subparsers):
-    parser_getbalance = subparsers.add_parser("getprivatekey", help="Get balance of specified wallet.")
+    parser_getbalance = subparsers.add_parser("getprivatekey", help="Get private key of specified wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_getprivatekey)
-    parser_getbalance.add_argument("wallet_type", help="The specified wallet type", choices=wallet_type)
+    parser_getbalance.add_argument("wallet_type", help="The wallet type", choices=wallet_type)
     pass
 
 def add_parser_wallet_fees(subparsers):
-    parser_getbalance = subparsers.add_parser("fees", help="Get balance of specified wallet.")
+    parser_getbalance = subparsers.add_parser("fees", help="Get fees of specified wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_fees)
-    parser_getbalance.add_argument("wallet_type", help="The specified wallet type", choices=wallet_type)
+    parser_getbalance.add_argument("wallet_type", help="The wallet type", choices=wallet_type)
     pass
 
 
