@@ -47,7 +47,7 @@ class MullVad(VpnHoster):
 
     @staticmethod
     def get_metadata():
-        return "MullVad", "https://www.mnullvad.net/en"
+        return "MullVad", "https://www.mullvad.net/en"
 
     @staticmethod
     def get_required_settings():

@@ -22,7 +22,7 @@ standard_library.install_aliases()
 
 class InstallMullvad(object):
     CONFIGURATION_URL = "https://mullvad.net/en/download/config/"
-    TESTING_URL = "https://am.i.mullvad.net/json"
+    TESTING_URL = "https://am.i.mullvad.net/"
 
     c_vpn_config_dir = os.path.dirname(os.path.realpath(__file__)) + '/mullvad_openvpn_config_files'
 
@@ -31,30 +31,18 @@ class InstallMullvad(object):
         self._settings = Settings()
         self._settings.read_settings()
 
-    def _check_vpn(self, setup=False):
+    def _check_vpn(self):
         # Check if VPN is active
-        response = requests.get(self.TESTING_URL)
-        print(response.json())
-
-        # Check if IP's country is Sweden
-        if response.json()["country"] == "Sweden":
-            print("VPN is active!")
-        else:
-            if setup:
-                print("Error: VPN was not installed!")
-            else:
-                try:
-                    self._settings.get("Mullvad", "accountnumber")
-                except Exception as e:
-                    print("Error: Account not found, please purchase one!")
-                    #print(self._error_message(e))
-                    sys.exit(1)
-                self.setup_vpn()
+        page = self._browser.open(self.TESTING_URL).text
+        for line in page.splitlines():
+            if 'class="hero-header"' in line:
+                print(line.split(">")[1].split("<")[0])
+                break
 
     # Automatically sets up VPN with settings from provider
-    def setup_vpn(self):
+    def setup_vpn(self, country="se-sto"):
         # Get the necessary files for connecting to the VPN service
-        self._download_files()
+        self._download_files(country)
         result = os.popen("sudo chmod -R 777 " + self.c_vpn_config_dir)
 
         # Copy files to OpenVPN folder
@@ -64,7 +52,7 @@ class InstallMullvad(object):
         os.chdir("/etc/openvpn/")
 
         # Start OpenVPN connection
-        result = os.popen("sudo nohup openvpn --config ./mullvad_se-sto.conf > /dev/null &").read()
+        result = os.popen("sudo nohup openvpn --config ./mullvad_" + country + ".conf > /dev/null &").read()
         #result = os.popen("sudo service openvpn start").read()
         print(result)
 
@@ -74,13 +62,33 @@ class InstallMullvad(object):
         self._check_vpn(True)
 
     # Download configuration files for setting up VPN and extract them
-    def _download_files(self):
+    def _download_files(self, country):
+        try:
+            self._settings.get("Mullvad", "accountnumber")
+        except Exception as e:
+            print("Error: Account not found, please purchase one!")
+            #print(self._error_message(e))
+            sys.exit(0)
+
         # Fill information on website to get right files for openVPN
         self._browser.open(self.CONFIGURATION_URL)
+        
+        #Check if country is available
+        soup = self._browser.get_current_page()
+        country_options = soup.select('select[name=region] > option')
+        #print(country_options)
+        if 'value="'+country+'"' not in str(country_options):
+            print("Error: Country code incorrect, please use one of the following country codes:")
+            i = 2
+            while i < len(country_options) - 1:
+                print(str(country_options[i]).split("=")[1].split(">")[0], end=' ')
+                print(str(country_options[i]).split("=")[1].split(">")[1].split("<")[0])
+                i += 1
+            sys.exit(0)
         form = self._browser.select_form()
         form["account_token"] = self._settings.get("Mullvad", "accountnumber")
         form["platform"] = "linux"
-        form["region"] = "se-sto"
+        form["region"] = country
         form["port"] = "0"
         self._browser.session.headers["Referer"] = self._browser.get_url()
         response = self._browser.submit_selected()
@@ -111,8 +119,9 @@ class InstallMullvad(object):
         # Delete zip file
         os.remove(files_path)
 
-# if __name__ == '__main__':
-#     mullvad = InstallMullvad()
-#     mullvad._settings.put("Mullvad", "accountnumber", "6798499523758101")
-#     mullvad._settings.save_settings()
-#     mullvad._check_vpn()
+if __name__ == '__main__':
+    mullvad = InstallMullvad()
+    mullvad._settings.put("Mullvad", "accountnumber", "6798499523758101")
+    mullvad._settings.save_settings()
+    #mullvad.setup_vpn("blablad")
+    mullvad._check_vpn()
