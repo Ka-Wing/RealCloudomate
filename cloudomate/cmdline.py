@@ -22,8 +22,8 @@ from cloudomate import ethereum_wallet as ethereum_wallet_util
 from cloudomate.util.installvpn_mullvad import InstallMullvad
 from cloudomate.hoster.vpn.azirevpn import AzireVpn
 from cloudomate.hoster.vpn.mullvad import MullVad
-from cloudomate.hoster.vpn.torguard_purchase import torguard
-from cloudomate.hoster.vpn.vpnac_purchase import vpnac
+from cloudomate.hoster.vpn.vpnac_purchase import vpnacVPNPurchaser
+from cloudomate.hoster.vpn.torguard_purchase import torguardVPNPurchaser
 from cloudomate.hoster.vps.blueangelhost import BlueAngelHost
 from cloudomate.hoster.vps.ccihosting import CCIHosting
 from cloudomate.hoster.vps.crowncloud import CrownCloud
@@ -57,16 +57,16 @@ providers = CaseInsensitiveDict({
     "vpn_bitcoin": _map_providers_to_dict([
         AzireVpn,
         MullVad,
-        torguard,
-        vpnac
+        torguardVPNPurchaser,
+        vpnacVPNPurchaser
     ]),
     "vps_ethereum": _map_providers_to_dict([
         BlueAngelHost
     ]),
     "vpn_ethereum": _map_providers_to_dict([
         AzireVpn,
-        torguard,
-        vpnac
+        torguardVPNPurchaser,
+        vpnacVPNPurchaser
     ])
 })
 
@@ -79,6 +79,8 @@ def execute(cmd=sys.argv[1:]):
     add_vpn_parsers_bitcoin(subparsers)
     add_vps_parsers_ethereum(subparsers)
     add_vpn_parsers_ethereum(subparsers)
+    add_install_vpn(subparsers)
+    add_wallet(subparsers)
     subparsers.required = True
 
     args = parser.parse_args(cmd)
@@ -141,6 +143,53 @@ def add_vps_parsers_ethereum(subparsers):
     add_parser_vps_get_ip(vps_subparsers)
     add_parser_vps_ssh(vps_subparsers)
     add_parser_info(vps_subparsers, "vps_ethereum")
+
+
+def add_wallet(subparsers):
+    wallet_parsers = subparsers.add_parser("wallet")
+    wallet_parsers.set_defaults(type="wallet")
+    wallet_subparsers = wallet_parsers.add_subparsers(dest="wallet_type")
+    #wallet_subparsers.add_argument("getbalance", help="Get balance of wallet.")
+    wallet_subparsers.required = True
+
+    add_ethereum_wallet(wallet_subparsers)
+    add_bitcoin_wallet(wallet_subparsers)
+
+def add_ethereum_wallet(subparsers):
+    ethereum_parsers = subparsers.add_parser("ethereum")
+    ethereum_parsers.set_defaults(type="wallet_type")
+    ethereum_subparsers = ethereum_parsers.add_subparsers(dest="command")
+    ethereum_subparsers.required = True
+
+    add_parser_wallet_getbalance(ethereum_subparsers)
+    add_parser_wallet_getaddress(ethereum_subparsers)
+    add_parser_wallet_getprivatekey(ethereum_subparsers)
+    add_parser_wallet_getfees(ethereum_subparsers)
+
+def add_bitcoin_wallet(subparsers):
+    bitcoin_parsers = subparsers.add_parser("bitcoin")
+    bitcoin_parsers.set_defaults(type="wallet_type")
+    bitcoin_subparsers = bitcoin_parsers .add_subparsers(dest="command")
+    bitcoin_subparsers.required = True
+
+    add_parser_wallet_getbalance(bitcoin_subparsers)
+    add_parser_wallet_getaddress(bitcoin_subparsers)
+    add_parser_wallet_getprivatekey(bitcoin_subparsers)
+    add_parser_wallet_getfees(bitcoin_subparsers)
+
+# def hallo(args):
+#     print(args)
+#
+#     if "person" in vars(args):
+#         print("yes: person")
+#         print(args.person)
+#
+#     #testWallet = EthereumWallet()
+#     #testWallet.address
+#     print("Hallo")
+#     print(ethereum_wallet_util.get_network_fee())
+
+
 
 def add_install_vpn(subparsers):
     vpn_parsers = subparsers.add_parser("install_vpn")
@@ -257,6 +306,26 @@ def add_parser_vps_setrootpw(subparsers):
     parser_setrootpw.add_argument("-e", "--email", help="The login email address")
     parser_setrootpw.add_argument("-pw", "--password", help="The login password")
     parser_setrootpw.set_defaults(func=change_root_password_ssh)
+
+def add_parser_wallet_getbalance(subparsers):
+    parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_getbalance)
+    pass
+
+def add_parser_wallet_getaddress(subparsers):
+    parser_getbalance = subparsers.add_parser("getaddress", help="Get address of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_getaddress)
+    pass
+
+def add_parser_wallet_getprivatekey(subparsers):
+    parser_getbalance = subparsers.add_parser("getprivatekey", help="Get private key of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_getprivatekey)
+    pass
+
+def add_parser_wallet_getfees(subparsers):
+    parser_getbalance = subparsers.add_parser("getfees", help="Get fees of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_fees)
+    pass
 
 
 def print_ip(args):
@@ -644,6 +713,35 @@ def change_root_password_ssh(args):
     else:
         print("Failed to set the new root password")
         sys.exit(2)
+
+def wallet_getbalance(args):
+    print("wallet_getbalance()")
+    if args.wallet_type == "bitcoin":
+        print("bitcoin_wallet: This can be used to call any method.")
+    elif args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
+def wallet_getaddress(args):
+    print("wallet_getaddress()")
+    if args.wallet_type == "bitcoin":
+        print("bitcoin_wallet: This can be used to call any method.")
+    elif args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
+def wallet_getprivatekey(args):
+    print("wallet_getprivatekey()")
+    if args.wallet_type == "bitcoin":
+        print("bitcoin_wallet: This can be used to call any method.")
+    elif args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
+def wallet_fees(args):
+    print("wallet_getfees()")
+    if args.wallet_type == "bitcoin":
+        print("bitcoin_wallet: This can be used to call any method.")
+    elif args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
 
 
 def _print_info_vps(info):
