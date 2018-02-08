@@ -67,6 +67,12 @@ providers = CaseInsensitiveDict({
         AzireVpn,
         torguardVPNPurchaser,
         vpnacVPNPurchaser
+    ]),
+    "vpn" : _map_providers_to_dict([
+        AzireVpn,
+        MullVad,
+        vpnacVPNPurchaser,
+        torguardVPNPurchaser,
     ])
 })
 
@@ -74,17 +80,70 @@ providers = CaseInsensitiveDict({
 def execute(cmd=sys.argv[1:]):
     parser = ArgumentParser(description="Cloudomate")
 
-    subparsers = parser.add_subparsers(dest="type")
-    add_vps_parsers_bitcoin(subparsers)
-    add_vpn_parsers_bitcoin(subparsers)
-    add_vps_parsers_ethereum(subparsers)
-    add_vpn_parsers_ethereum(subparsers)
-    add_install_vpn(subparsers)
-    add_wallet(subparsers)
+    # subparsers = parser.add_subparsers(dest="type")
+    # add_vps_parsers_bitcoin(subparsers)
+    # add_vpn_parsers_bitcoin(subparsers)
+    # add_vps_parsers_ethereum(subparsers)
+    # add_vpn_parsers_ethereum(subparsers)
+    # add_install_vpn(subparsers)
+    # add_wallet(subparsers)
+
+    subparsers = parser.add_subparsers(dest="1")
+    add_vpn_purchase(subparsers)
+    add_vpn_status(subparsers)
+    add_vpn_turn_on(subparsers)
+    add_vpn_turn_off(subparsers)
+
     subparsers.required = True
 
     args = parser.parse_args(cmd)
     args.func(args)
+
+def add_vpn_purchase(subparsers):
+    parser_purchase = subparsers.add_parser("vpn-purchase", help="Purchase VPN")
+    parser_purchase.set_defaults(func=vpn_purchase)
+    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_purchase.add_argument("--coin", help="Choose the cryptocurrency used for puchasing.")
+    parser_purchase.add_argument("--feemultiplier", help="Choose the cryptocurrency used for puchasing.")
+    parser_purchase.add_argument("--accountnr", help="Choose the cryptocurrency used for purchasing.")
+    parser_purchase.add_argument("--username", help="Choose the username.")
+    parser_purchase.add_argument("--password", help="Choose the password.")
+    parser_purchase.add_argument("-r", help="Given username is already registered.", action="store_true")
+    parser_purchase.add_argument("-f", help="Don't prompt for user confirmation", dest="noconfirm", action="store_true")
+
+def add_vpn_status(subparsers):
+    parser_purchase = subparsers.add_parser("vpn-status", help="Check VPN status")
+    parser_purchase.set_defaults(func=vpn_status)
+    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+
+def add_vpn_turn_on(subparsers):
+    parser_purchase = subparsers.add_parser("vpn-status", help="Check VPN status")
+    parser_purchase.set_defaults(func=vpn_turn_on)
+    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_purchase.add_argument("--country", help="The location of the server through which you would like to router traffic", choices=providers['vpn'])
+
+def add_vpn_turn_off(subparsers):
+    parser_purchase = subparsers.add_parser("vpn-status", help="Check VPN status")
+    parser_purchase.set_defaults(func=vpn_turn_off)
+    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+
+def vpn_purchase(args):
+    print(args)
+    print(args.provider)
+    pass
+
+def vpn_status(args):
+    print(args)
+    pass
+
+def vpn_turn_on(args):
+    print(args)
+    pass
+
+def vpn_turn_off(args):
+    print(args)
+    pass
+
 
 
 def add_vpn_parsers_bitcoin(subparsers):
@@ -169,7 +228,7 @@ def add_ethereum_wallet(subparsers):
 def add_bitcoin_wallet(subparsers):
     bitcoin_parsers = subparsers.add_parser("bitcoin")
     bitcoin_parsers.set_defaults(type="wallet_type")
-    bitcoin_subparsers = bitcoin_parsers .add_subparsers(dest="command")
+    bitcoin_subparsers = bitcoin_parsers.add_subparsers(dest="command")
     bitcoin_subparsers.required = True
 
     add_parser_wallet_getbalance(bitcoin_subparsers)
@@ -310,6 +369,10 @@ def add_parser_vps_setrootpw(subparsers):
 def add_parser_wallet_getbalance(subparsers):
     parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_getbalance)
+    parser_getbalance.add_argument("hallo", help="This is a test method")
+    parser_getbalance.add_argument("-a", "--armando", help="This is a test method")
+    #parser_getbalance.add_argument('v', help="v")
+    #parser_getbalance.set_argument('')
     pass
 
 def add_parser_wallet_getaddress(subparsers):
@@ -715,6 +778,8 @@ def change_root_password_ssh(args):
         sys.exit(2)
 
 def wallet_getbalance(args):
+    print(args)
+
     print("wallet_getbalance()")
     if args.wallet_type == "bitcoin":
         print("bitcoin_wallet: This can be used to call any method.")

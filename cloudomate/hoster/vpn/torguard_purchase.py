@@ -16,11 +16,7 @@ class torguardVPNPurchaser(coinpaymentsVpnProvider):
     COINPAYMENTS_URL = 'https://www.coinpayments.net/index.php?cmd=checkout'
 
     saveUserLoginFile = os.path.expanduser("~") + '/.config/torguard_login.txt'
-
-    #TODO redundant
-    vpnProviderName = "Torguard"
-    vpnProviderBaseUrl = "https://torguard.net"
-
+    
     @staticmethod
     def get_metadata():
         return "TorGuard", "https://www.torguard.net/"

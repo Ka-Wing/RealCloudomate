@@ -17,13 +17,9 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
 
     saveUserLoginFile = os.path.expanduser("~") + '/.config/vpnac_login.txt'
 
-    # TODO redundant
-    vpnProviderName = "vpn.ac"
-    vpnProviderBaseUrl = "https://vpn.ac"
-
     @staticmethod
     def get_metadata():
-        return "TorGuard", "https://www.torguard.net/"
+        return "VpnAc", "https://vpn.ac"
 
     @staticmethod
     def get_gateway():
