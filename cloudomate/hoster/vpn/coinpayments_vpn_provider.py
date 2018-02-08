@@ -47,6 +47,7 @@ class coinpaymentsVpnProvider(ABC):
         except Exception as e:
             print(self._error_message(e))
 
+    #TODO DOES NOT ACCEPT LITECOIN.
     # Use this method for purchasing with Litecoin.
     def retrieve_litecoin(self, user_settings):
         try:

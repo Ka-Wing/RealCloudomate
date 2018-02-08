@@ -65,7 +65,7 @@ class torguardServiceRetriever():
 
     def _login(self, login_username, login_password):
         if self.driver is None:
-            raise Exception("Driver not set")
+            print("Selenium Chromedriver not set")
 
         self.driver.get("https://torguard.net/clientarea.php")
 
@@ -85,7 +85,7 @@ class torguardServiceRetriever():
 
         try:
             error_message = self.driver.find_element_by_class_name("alert-danger").text
-            print("Error during login: \"" + error_message + "\"")
+            print("Website returned an error during login: \"" + error_message + "\"")
             exit(0)
         except Exception:
             pass
@@ -217,7 +217,8 @@ class torguardServiceRetriever():
 
     def _change_password(self, password):
         if self.driver.current_url != "https://torguard.net/managecredentials.php":
-            raise Exception("Driver did not detect the manage credentials page.")
+            print("Driver did not detect the manage credentials page.")
+            exit(0)
 
         # Finding the cell containing password management
         password_cell = self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/table/tbody/tr/td[3]")

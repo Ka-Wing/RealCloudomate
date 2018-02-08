@@ -49,10 +49,10 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
             errorbox = self.driver.find_element_by_class_name("errorbox")
             error_message = True
         except Exception:
-            #If class name not found, then there are no errors.
-            pass
+            # If class name not found, then there are no errors.
+         pass
         if error_message:
-            print("Error during placing order: \"" + errorbox.text + "\"")
+            print("Website returned an error during order placing: \"" + errorbox.text + "\"")
             exit(0)
 
         time.sleep(2)
@@ -68,7 +68,7 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
 if __name__ == '__main__':
     vpnac = vpnacVPNPurchaser()
     user_settings = {"email": "mohamestest232westesttest@gmail.com", "password": "sfdjlsdmfsdlfkTest_12312", "registered": "1"}
-    vpnac.goToCoinPaymentsPage()
+    vpnac.retrieve_ethereum(user_settings)
     # b = vpnac.retrieve_ethereum(user_settings)
     # print(b['amount'])
     # print(b['address'])
