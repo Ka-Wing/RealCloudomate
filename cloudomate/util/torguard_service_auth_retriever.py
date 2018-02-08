@@ -22,6 +22,7 @@ class torguardServiceRetriever():
 
         # Sets up Selenium
         self._driver_setup()
+        self._login("mohamed.amine.legheraba@gmail.com", "djamel75018")
 
         if wlogin_user != None and wlogin_passw != None:
             self.extractOpenVpnUserInfo(wlogin_user, wlogin_passw)
@@ -82,6 +83,14 @@ class torguardServiceRetriever():
         self.driver.find_element_by_id("username").send_keys(login_username)
         self.driver.find_element_by_id("password").send_keys(login_password)
         self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/form/fieldset/div[3]/div/input[1]").click()
+
+        try:
+            error_message = self.driver.find_element_by_class_name("alert-danger").text
+            print("Error during login: \"" + error_message + "\"")
+            exit(0)
+        except Exception:
+            pass
+
 
     def _driver_setup(self):
         options = webdriver.ChromeOptions()
