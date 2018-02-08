@@ -148,14 +148,34 @@ def add_vps_parsers_ethereum(subparsers):
 def add_wallet(subparsers):
     wallet_parsers = subparsers.add_parser("wallet")
     wallet_parsers.set_defaults(type="wallet")
-    wallet_subparsers = wallet_parsers.add_subparsers(dest="command")
+    wallet_subparsers = wallet_parsers.add_subparsers(dest="wallet_type")
     #wallet_subparsers.add_argument("getbalance", help="Get balance of wallet.")
     wallet_subparsers.required = True
 
-    add_parser_wallet_getbalance(wallet_subparsers)
-    add_parser_wallet_getaddress(wallet_subparsers)
-    add_parser_wallet_getprivatekey(wallet_subparsers)
-    add_parser_wallet_fees(wallet_subparsers)
+    add_ethereum_wallet(wallet_subparsers)
+    add_bitcoin_wallet(wallet_subparsers)
+
+def add_ethereum_wallet(subparsers):
+    ethereum_parsers = subparsers.add_parser("ethereum")
+    ethereum_parsers.set_defaults(type="wallet_type")
+    ethereum_subparsers = ethereum_parsers.add_subparsers(dest="command")
+    ethereum_subparsers.required = True
+
+    add_parser_wallet_getbalance(ethereum_subparsers)
+    add_parser_wallet_getaddress(ethereum_subparsers)
+    add_parser_wallet_getprivatekey(ethereum_subparsers)
+    add_parser_wallet_getfees(ethereum_subparsers)
+
+def add_bitcoin_wallet(subparsers):
+    bitcoin_parsers = subparsers.add_parser("bitcoin")
+    bitcoin_parsers.set_defaults(type="wallet_type")
+    bitcoin_subparsers = bitcoin_parsers .add_subparsers(dest="command")
+    bitcoin_subparsers.required = True
+
+    add_parser_wallet_getbalance(bitcoin_subparsers)
+    add_parser_wallet_getaddress(bitcoin_subparsers)
+    add_parser_wallet_getprivatekey(bitcoin_subparsers)
+    add_parser_wallet_getfees(bitcoin_subparsers)
 
 # def hallo(args):
 #     print(args)
@@ -288,27 +308,23 @@ def add_parser_vps_setrootpw(subparsers):
     parser_setrootpw.set_defaults(func=change_root_password_ssh)
 
 def add_parser_wallet_getbalance(subparsers):
-    parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of specified wallet.")
+    parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_getbalance)
-    parser_getbalance.add_argument("wallet_type", help="The specified wallet type", choices=wallet_type)
     pass
 
 def add_parser_wallet_getaddress(subparsers):
-    parser_getbalance = subparsers.add_parser("getaddress", help="Get address of specified wallet.")
+    parser_getbalance = subparsers.add_parser("getaddress", help="Get address of wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_getaddress)
-    parser_getbalance.add_argument("wallet_type", help="The specified wallet type", choices=wallet_type)
     pass
 
 def add_parser_wallet_getprivatekey(subparsers):
-    parser_getbalance = subparsers.add_parser("getprivatekey", help="Get private key of specified wallet.")
+    parser_getbalance = subparsers.add_parser("getprivatekey", help="Get private key of wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_getprivatekey)
-    parser_getbalance.add_argument("wallet_type", help="The wallet type", choices=wallet_type)
     pass
 
-def add_parser_wallet_fees(subparsers):
-    parser_getbalance = subparsers.add_parser("fees", help="Get fees of specified wallet.")
+def add_parser_wallet_getfees(subparsers):
+    parser_getbalance = subparsers.add_parser("getfees", help="Get fees of wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_fees)
-    parser_getbalance.add_argument("wallet_type", help="The wallet type", choices=wallet_type)
     pass
 
 
@@ -720,7 +736,7 @@ def wallet_getprivatekey(args):
         print("ethereum_wallet: This can be used to call any method.")
 
 def wallet_fees(args):
-    print("wallet_fees()")
+    print("wallet_getfees()")
     if args.wallet_type == "bitcoin":
         print("bitcoin_wallet: This can be used to call any method.")
     elif args.wallet_type == "ethereum":
